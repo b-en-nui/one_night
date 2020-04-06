@@ -1,0 +1,15 @@
+html {
+  height: 100%;
+}
+body {
+    display:flex;
+    align-items:center;
+    min-height: 100%;
+    font-family: monospace;
+    font-size: 1em;
+  }
+}
+div
+{
+    display : block;
+}

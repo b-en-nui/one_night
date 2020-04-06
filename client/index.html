@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>One Night - Lobby</title>
+        <meta charset="UTF-8"/>
+        <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+        <script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        <link rel="stylesheet" type="text/css" href="/client/css/style.css">
+    </head>
+
+    <body>
+        <div id="content" class="container justify-content-center">
+            <div class="row text-center">
+                <div id="pageHeader" class="container justify-content-center">
+                    <h3>One Night...</h3>
+                    <div id="initPrompt">
+                        <p>It's cold out there, traveller - come inside. What's your name?</p>
+                        <input type="text" placeholder="Pick a name" id="nameInput" size="16" v-on:keyup="submit">
+                        <button id="inputButton" v-on:click="setName">Set</button><br><br>
+                    </div>
+                    <div id="lobbyMenu" style="display:none">
+                        <strong>There are {{ playerCount }} in your party</strong><br>
+                        <div id="pList"></div>
+                        <div v-if="minPlayerCountMet">
+                            <br><button id="startGameButton" v-on:click="startGame">Ready!</button>
+                        </div>
+                        <div v-else>
+                            <br>Need more than {{minPlayerCount}} to start.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+    <script type="text/javascript" src="/client/js/lobby.js"></script>
+</html>
