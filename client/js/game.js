@@ -1,7 +1,24 @@
+var app = new Vue({
+    el: '#content',
+    data: {
+        name: null,
+        playerCount: null,
+        emojis: ["😉","😅","😇","😜","🤪","🤔","🤨","🤠","😤","🤦‍♀️"]
+    },
+    methods: {
+
+    },
+    mounted(){
+        setTimeout(() => {
+        }, 0);
+    }
+});
+
 console.log("Hello!")
 
-var user = getCookie("playername")
-console.log(user)
+var user = getCookie("playername");
+app.name = user;
+console.log(app.name)
 var socket = io('/game');
 
 function setCookie(cname, cvalue, exdays) {

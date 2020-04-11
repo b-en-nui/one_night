@@ -19,6 +19,7 @@ console.log('Listening on port 2000');
 
 var SOCKET_LIST = {};
 var PLAYER_LIST= {};
+var onLobby = true;
 
 var Player = function(id){
     var self = {
@@ -62,28 +63,31 @@ lobbyio.on('connection', function (socket) {
                 var socket = SOCKET_LIST[i];
                 socket.emit('redirect','/game');
             }
+            onLobby = false;
         }
     })
 });
 
-setInterval(function() {
-    var pack = [];
-    for (var i in PLAYER_LIST){
-        var player = PLAYER_LIST[i];
-        pack.push({
-            id: player.id,
-            name: player.name,
-            ready: player.ready
-        })
-    }
-    for (var i in SOCKET_LIST){
-        var socket = SOCKET_LIST[i];
-        socket.emit('playerInfo',pack);
-    }
-
-    console.log(PLAYER_LIST)
-
-}, 3000);
+while (onLobby == true){
+    setInterval(function() {
+        var pack = [];
+        for (var i in PLAYER_LIST){
+            var player = PLAYER_LIST[i];
+            pack.push({
+                id: player.id,
+                name: player.name,
+                ready: player.ready
+            })
+        }
+        for (var i in SOCKET_LIST){
+            var socket = SOCKET_LIST[i];
+            socket.emit('playerInfo',pack);
+        }
+    
+        console.log(PLAYER_LIST)
+    
+    }, 3000);
+}
 
 
 
