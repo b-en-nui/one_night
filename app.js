@@ -18,8 +18,9 @@ serv.listen(2000);
 console.log('Listening on port 2000');
 
 var SOCKET_LIST = {};
-var PLAYER_LIST= {};
+var PLAYER_LIST = {};
 var onLobby = true;
+var onGame = false;
 
 var Player = function(id){
     var self = {
@@ -59,17 +60,40 @@ lobbyio.on('connection', function (socket) {
         }
 
         if (partyReady) {
+            finalPlayerList = PLAYER_LIST;
             for (var i in SOCKET_LIST){
                 var socket = SOCKET_LIST[i];
                 socket.emit('redirect','/game');
             }
             onLobby = false;
+            onGame = true;
         }
     })
 });
 
-while (onLobby == true){
-    setInterval(function() {
+// game code
+
+gameio.on('connection', function (socket) {
+    console.log('player joined the game!')
+
+    socket.on('disconnect',function(){
+        console.log('player left the game')
+    });
+
+    socket.on('defineSocket', function (data) {
+        socket.id = data.id;
+        SOCKET_LIST[socket.id] = socket;
+        var player = Player(socket.id);
+        player.name = data.name;
+        PLAYER_LIST[socket.id] = player;
+    })
+});
+
+
+// update packets
+
+setInterval(function() {
+    if (onLobby){
         var pack = [];
         for (var i in PLAYER_LIST){
             var player = PLAYER_LIST[i];
@@ -85,18 +109,22 @@ while (onLobby == true){
         }
     
         console.log(PLAYER_LIST)
-    
-    }, 3000);
-}
+    }
 
+    if (onGame){
+        console.log(PLAYER_LIST);
+        var pack = [];
+        for (var i in PLAYER_LIST){
+            var player = PLAYER_LIST[i];
+            pack.push({
+                id: player.id,
+                name: player.name
+            })
+        }
+        for (var i in SOCKET_LIST){
+            var socket = SOCKET_LIST[i];
+            socket.emit('playerInfo',pack);
+        }
+    }
 
-
-// game code
-
-gameio.on('connection', function (socket) {
-    console.log('player joined the game!')
-
-    socket.on('disconnect',function(){
-        console.log('player left the game')
-    });
-});
+}, 3000);

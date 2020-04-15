@@ -14,31 +14,27 @@ var app = new Vue({
     }
 });
 
-console.log("Hello!")
-
-var user = getCookie("playername");
+var user = sessionStorage.clientName;
 app.name = user;
-console.log(app.name)
+console.log("Hello: " + app.name + sessionStorage.tabID)
 var socket = io('/game');
+socket.emit("defineSocket", {id:sessionStorage.tabID,name:sessionStorage.clientName});
 
-function setCookie(cname, cvalue, exdays) {
-    var d = new Date();
-    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
-    var expires = "expires="+d.toUTCString();
-    document.cookie = cname + sessionStorage.tabID + "=" + cvalue + ";" + expires + ";path=/";
+var playerDOMArray = [];
+for (var i = 1; i <= 8; i++){
+    var playerClassName = "player player"+i;
+    playerDOMArray.push(document.getElementsByClassName(playerClassName)[0]);
 }
-  
-function getCookie(cname) {
-    var name = cname + sessionStorage.tabID + "=";
-    var ca = document.cookie.split(';');
-    for(var i = 0; i < ca.length; i++) {
-        var c = ca[i];
-        while (c.charAt(0) == ' ') {
-            c = c.substring(1);
+
+socket.on("playerInfo", function (data) {
+    app.playerCount = data.length;
+    for (var i = 0; i < data.length; i++){
+        if (data[i].name == app.name){
+            playerDOMArray[(i*3)%8].innerHTML = "<strong>" + data[i].name + "</strong>";
         }
-        if (c.indexOf(name) == 0) {
-            return c.substring(name.length, c.length);
+        else{
+            playerDOMArray[(i*3)%8].innerHTML = "<strong>" + data[i].name + "  </strong><br>Whisper<br>Vote";
         }
     }
-    return "";
-}
+    console.log(data);
+})

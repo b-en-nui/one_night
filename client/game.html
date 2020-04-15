@@ -8,17 +8,37 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-        <link rel="stylesheet" type="text/css" href="/client/css/style.css">
+        <link rel="stylesheet" type="text/css" href="/client/css/game.css">
     </head>
 
     <body>
-        <div id="content" class="container justify-content-center">
-            <div class="row text-center">
-                <div id="pageHeader" class="container justify-content-center">
-                    Hello {{name}}!
+        <div id="content" class="container-fluid">
+            <div class="circle_container col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2 col-xs-12" style="width:50%;margin:10px auto">
+                <img class="transparent_square" src="http://i.stack.imgur.com/5Y4F4.jpg" width="2" height="2" />
+                <div class="central_text text-center">
+                    <h5>Hello {{name}}!</h5><br><h6>You are a <i>villager</i><br>Kill the werewolf!</h6>
                 </div>
+                
+                <div class="player_container player1"><div class="player player1"></div></div>
+                <div class="player_container player2"><div class="player player2"></div></div>
+                <div class="player_container player3"><div class="player player3"></div></div>
+                <div class="player_container player4"><div class="player player4"></div></div>
+                <div class="player_container player5"><div class="player player5"></div></div>
+                <div class="player_container player6"><div class="player player6"></div></div>
+                <div class="player_container player7"><div class="player player7"></div></div>
+                <div class="player_container player8"><div class="player player8"></div></div>
             </div>
-        </div>
+            </div>
     </body>
     <script type="text/javascript" src="/client/js/game.js"></script>
 </html>
+
+<!--
+<div id="content" class="container justify-content-center">
+    <div class="row text-center">
+        <div id="pageHeader" class="container justify-content-center">
+            Hello {{name}}!
+        </div>
+    </div>
+</div>
+-->
