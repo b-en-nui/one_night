@@ -21,12 +21,23 @@ var SOCKET_LIST = {};
 var PLAYER_LIST = {};
 var onLobby = true;
 var onGame = false;
+var shuffledRoles = null;
+
+var roleMatrix = {
+    3: ["werewolf","minion","seer","robber","troublemaker","villager"],
+    4: ["werewolf","seer","robber","troublemaker","drunk","insomniac","tanner"],
+    5: ["werewolf","seer","robber","troublemaker","drunk","insomniac","tanner","villager"],
+    6: ["werewolf","minion","seer","robber","troublemaker","drunk","insomniac","tanner","villager"],
+    7: ["werewolf","werewolf","minion","seer","robber","troublemaker","drunk","insomniac","tanner","villager"],
+    8: ["werewolf","werewolf","minion","seer","robber","troublemaker","drunk","insomniac","tanner","villager","villager"]
+}
 
 var Player = function(id){
     var self = {
         id:id,
         name:'',
-        ready:false
+        ready:false,
+        role: ''
     }
     return self;
 }
@@ -65,6 +76,7 @@ lobbyio.on('connection', function (socket) {
                 var socket = SOCKET_LIST[i];
                 socket.emit('redirect','/game');
             }
+            shuffledRoles = shuffleArray(roleMatrix[Object.keys(PLAYER_LIST).length]);
             onLobby = false;
             onGame = true;
         }
@@ -72,7 +84,6 @@ lobbyio.on('connection', function (socket) {
 });
 
 // game code
-
 gameio.on('connection', function (socket) {
     console.log('player joined the game!')
 
@@ -114,13 +125,19 @@ setInterval(function() {
     if (onGame){
         console.log(PLAYER_LIST);
         var pack = [];
+        var playerCount = 0;
         for (var i in PLAYER_LIST){
             var player = PLAYER_LIST[i];
+            player.role = shuffledRoles[playerCount]; //add error handling for not 3-8 players
+            console.log(shuffledRoles[playerCount]);
             pack.push({
                 id: player.id,
-                name: player.name
+                name: player.name,
+                role: player.role
             })
+            playerCount++;
         }
+        pack.push(shuffledRoles.slice(shuffledRoles.length-3, shuffledRoles.length));
         for (var i in SOCKET_LIST){
             var socket = SOCKET_LIST[i];
             socket.emit('playerInfo',pack);
@@ -128,3 +145,14 @@ setInterval(function() {
     }
 
 }, 3000);
+
+/* Randomize array in-place using Durstenfeld shuffle algorithm */
+function shuffleArray(array) {
+    for (var i = array.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+    return array;
+}

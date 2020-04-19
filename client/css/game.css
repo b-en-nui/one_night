@@ -12,6 +12,25 @@ div {
     display : block;
 }
 
+.topleft {
+    position: absolute;
+    top: 8px;
+    left: 16px;
+    white-space: pre;
+    font-size: 9px;
+}
+.bottomright {
+    position: absolute;
+    bottom: 2px;
+    right: 16px;
+    white-space: pre;
+    font-size: 9px;
+}
+.bottomleft {
+    position: absolute;
+    bottom: 2px;
+    left: 16px;
+}
 .transparent_square{
 	width: 100%;
 	height: auto;
