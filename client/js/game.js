@@ -33,7 +33,7 @@ socket.emit("defineSocket", {id:sessionStorage.tabID,name:sessionStorage.clientN
 
 // 3) Generates playerDOMArray - filled by playerInfo
 var playerDOMArray = [];
-for (var i = 1; i <= 8; i++){
+for (var i = 0; i < 8; i++){
     var playerClassName = "player player"+i;
     playerDOMArray.push(document.getElementsByClassName(playerClassName)[0]);
 }
@@ -42,12 +42,16 @@ for (var i = 1; i <= 8; i++){
 socket.on("playerInfo", function (data) {
     app.playerCount = data.length;
     for (var i = 0; i < data.length-1; i++){
+        var index = (i*3)%8;
         if (data[i].name == app.name){
             app.role = data[i].role;
-            playerDOMArray[(i*3)%8].innerHTML = "<strong>" + data[i].name + " (you), </strong>" + data[i].role;
+            document.getElementById("playername"+index).innerHTML = "<b>" + data[i].name + " (you), </b>";
+            document.getElementById("playerrole"+index).innerHTML = data[i].role;
         }
         else{
-            playerDOMArray[(i*3)%8].innerHTML = "<strong>" + data[i].name + "  </strong>" + data[i].role;
+            document.getElementById("playername"+index).innerHTML = "<b>" + data[i].name + "</b>";
+            document.getElementById("playerrole"+index).innerHTML = " <sub>(" + data[i].role + ")</sub>";
+            document.getElementById("playerpeek"+index).style.display = "block";
         }
     }
     console.log("in the middle: " + data[data.length - 1]);
@@ -55,3 +59,12 @@ socket.on("playerInfo", function (data) {
         + app.roleMatrix[data.length - 1];
     console.log(data);
 })
+
+function peekPlayer(thisPlayer){
+    console.log("BUTTON PRESS");
+    var playerRoleID = "playerrole" + thisPlayer.attributes.alt.value;
+    var buttonID = "peek" + thisPlayer.attributes.alt.value;
+    document.getElementById(playerRoleID).style.display = "block";
+    document.getElementById(buttonID).style.display = "none";
+
+}

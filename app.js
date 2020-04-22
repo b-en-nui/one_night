@@ -22,6 +22,7 @@ var PLAYER_LIST = {};
 var onLobby = true;
 var onGame = false;
 var shuffledRoles = null;
+var middleRoles = null;
 
 var roleMatrix = {
     3: ["werewolf","minion","seer","robber","troublemaker","villager"],
@@ -77,6 +78,7 @@ lobbyio.on('connection', function (socket) {
                 socket.emit('redirect','/game');
             }
             shuffledRoles = shuffleArray(roleMatrix[Object.keys(PLAYER_LIST).length]);
+            middleRoles = shuffledRoles.slice(shuffledRoles.length-3, shuffledRoles.length);
             onLobby = false;
             onGame = true;
         }
@@ -137,7 +139,7 @@ setInterval(function() {
             })
             playerCount++;
         }
-        pack.push(shuffledRoles.slice(shuffledRoles.length-3, shuffledRoles.length));
+        pack.push(middleRoles);
         for (var i in SOCKET_LIST){
             var socket = SOCKET_LIST[i];
             socket.emit('playerInfo',pack);
