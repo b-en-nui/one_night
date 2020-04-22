@@ -69,14 +69,18 @@
             <div class="bottomleft"></div>
             <div class="circle_container col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2 col-xs-12" style="width:50%;margin:10px auto">
                 <img class="transparent_square" src="http://i.stack.imgur.com/5Y4F4.jpg" width="2" height="2" />
-                <div class="central_text text-center">
-Hello {{name}}!<br>You are a <i>{{role}}</i>...</h6><br>
- _____    _____    _____ 
-|w    |  |w    |  |w    |
-|  &  |  |  &  |  |  &  |
-|     |  |     |  |     |
-|  &  |  |  &  |  |  &  |
-|____w|  |____w|  |____w|
+                <div class="container central_text text-center">
+                  Hello {{name}}!<br>You are a <i>{{role}}</i>...</h6><br>
+                  <div id="defaultCenterRow" class="row" style="justify-content:center">
+                    <button id="defaultMid0" alt="0" disabled="disabled">Card</button>
+                    <button id="defaultMid1" alt="1" disabled="disabled">Card</button>
+                    <button id="defaultMid2" alt="2" disabled="disabled">Card</button>
+                  </div>
+                  <div id="peekCenterRow" class="row" style="justify-content:center">
+                    <button id="peekMid0" alt="0" onclick="peekMid(this)" title="Click to peek!">Card</button>
+                    <button id="peekMid1" alt="1" onclick="peekMid(this)" title="Click to peek!">Card</button>
+                    <button id="peekMid2" alt="2" onclick="peekMid(this)" title="Click to peek!">Card</button>
+                  </div>
                 </div>
                 
                 <div class="player_container player0">

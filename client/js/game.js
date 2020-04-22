@@ -23,6 +23,8 @@ var app = new Vue({
     }
 });
 
+var playerData = null;
+
 // 1) Grabs username from sessionStorage
 app.name = sessionStorage.clientName;
 console.log("Hello: " + app.name + sessionStorage.tabID)
@@ -40,13 +42,15 @@ for (var i = 0; i < 8; i++){
 
 
 socket.on("playerInfo", function (data) {
+    playerData = data;
     app.playerCount = data.length;
     for (var i = 0; i < data.length-1; i++){
         var index = (i*3)%8;
         if (data[i].name == app.name){
             app.role = data[i].role;
-            document.getElementById("playername"+index).innerHTML = "<b>" + data[i].name + " (you), </b>";
-            document.getElementById("playerrole"+index).innerHTML = data[i].role;
+            document.getElementById("playername"+index).innerHTML = "<b>you</b>";
+            document.getElementById("playerrole"+index).innerHTML = "<sub>(" + data[i].role + ")</sub>";
+            document.getElementById("playerrole"+index).style.display = "block";
         }
         else{
             document.getElementById("playername"+index).innerHTML = "<b>" + data[i].name + "</b>";
@@ -66,5 +70,10 @@ function peekPlayer(thisPlayer){
     var buttonID = "peek" + thisPlayer.attributes.alt.value;
     document.getElementById(playerRoleID).style.display = "block";
     document.getElementById(buttonID).style.display = "none";
+}
 
+function peekMid(thisCard){
+    console.log("BUTTON PRESS");
+    var peekedRole = playerData[playerData.length-1][thisCard.attributes.alt.value];
+    document.getElementById("peekCenterRow").innerHTML = "That card was&nbsp;<i>" + peekedRole + "</i>";
 }
