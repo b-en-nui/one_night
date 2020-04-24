@@ -99,12 +99,41 @@ gameio.on('connection', function (socket) {
         var player = Player(socket.id);
         player.name = data.name;
         PLAYER_LIST[socket.id] = player;
-    })
+    });
+
+    socket.on('peekRole', function (data) {
+        if (data.isMid){
+            var peekedCard = middleRoles[data.id];
+            socket.emit("peekInfo", {role:peekedCard, isMid:data.isMid});
+        }
+        else{
+            var peekedPlayer = PLAYER_LIST[data.id];
+            socket.emit("peekInfo", {player:peekedPlayer, divID:data.divID, isMid:data.isMid});
+        }
+
+    });
+
+    socket.on('robRole', function (data) {
+        var robbedPlayer = PLAYER_LIST[data.id];
+        var robberPlayer = PLAYER_LIST[data.myid];
+
+        var stolenRole = robbedPlayer.role;
+        robbedPlayer.role = data.myrole;
+        robberPlayer.role = stolenRole;
+
+        PLAYER_LIST[data.id] = robbedPlayer;
+        PLAYER_LIST[data.myid] = robberPlayer;
+
+        var temp = shuffledRoles[data.divID];
+        shuffledRoles[data.divID] = shuffledRoles[data.mydivID];
+        shuffledRoles[data.mydivID] = temp;
+
+        socket.emit("robInfo", {divID:data.divID, mydivID:data.mydivID, role:stolenRole})
+    });
 });
 
-
 // update packets
-
+var frameCount = 0;
 setInterval(function() {
     if (onLobby){
         var pack = [];
@@ -120,18 +149,17 @@ setInterval(function() {
             var socket = SOCKET_LIST[i];
             socket.emit('playerInfo',pack);
         }
-    
-        console.log(PLAYER_LIST)
+        //console.log(PLAYER_LIST); //(helpful for debugging)
     }
 
+    
     if (onGame){
-        console.log(PLAYER_LIST);
+        // console.log(PLAYER_LIST); //(helpful for debugging)
         var pack = [];
         var playerCount = 0;
         for (var i in PLAYER_LIST){
             var player = PLAYER_LIST[i];
             player.role = shuffledRoles[playerCount]; //add error handling for not 3-8 players
-            console.log(shuffledRoles[playerCount]);
             pack.push({
                 id: player.id,
                 name: player.name,
@@ -144,8 +172,9 @@ setInterval(function() {
             var socket = SOCKET_LIST[i];
             socket.emit('playerInfo',pack);
         }
+        console.log(frameCount);
+        frameCount++;
     }
-
 }, 3000);
 
 /* Randomize array in-place using Durstenfeld shuffle algorithm */

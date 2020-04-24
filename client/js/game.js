@@ -2,8 +2,10 @@ var app = new Vue({
     el: '#content',
     data: {
         name: null,
+        id: null,
         playerCount: null,
         role: null,
+        divID: null,
         emojis: ["😉","😅","😇","😜","🤪","🤔","🤨","🤠","😤","🤦‍♀️"],
         roleMatrix:  {
             3: ["werewolf","minion","seer","robber","troublemaker","villager"],
@@ -23,7 +25,9 @@ var app = new Vue({
     }
 });
 
-var playerData = null;
+var initialPlayerData = null;
+var currentPlayerData = null;
+var frameCount = 0;
 
 // 1) Grabs username from sessionStorage
 app.name = sessionStorage.clientName;
@@ -33,47 +37,78 @@ console.log("Hello: " + app.name + sessionStorage.tabID)
 var socket = io('/game');
 socket.emit("defineSocket", {id:sessionStorage.tabID,name:sessionStorage.clientName});
 
-// 3) Generates playerDOMArray - filled by playerInfo
-var playerDOMArray = [];
-for (var i = 0; i < 8; i++){
-    var playerClassName = "player player"+i;
-    playerDOMArray.push(document.getElementsByClassName(playerClassName)[0]);
-}
-
-
+// Server emits data packet on set interval that is received here to do the following:
+//      1) Update currentPlayerData array
+//      2) Fill player names in center circle
+//      3) Fill role list in bottom left
 socket.on("playerInfo", function (data) {
-    playerData = data;
+    currentPlayerData = data;
     app.playerCount = data.length;
+    if (frameCount == 0){
+        console.log("Initializing....");
+        initializePlayerBoard(data);
+        initialPlayerData = data;
+    }
+    console.log(frameCount);
+    frameCount++;
+    //console.log(data);
+})
+
+
+socket.on("peekInfo", function (data) {
+    if (data.isMid){
+        document.getElementById("peekCenterRow").innerHTML = "That card was&nbsp;<i>" + data.role + "</i>";
+    }
+    else{
+        document.getElementById("playerrole"+data.divID).innerHTML = " <sub>(" + data.player.role + ")</sub>";
+        document.getElementById("playerrole"+data.divID).style.display = "block";
+        document.getElementById("peek"+data.divID).style.display = "none";
+    }
+})
+
+socket.on("robInfo", function (data) {
+    app.role = data.role;
+    document.getElementById("playerrole"+data.mydivID).innerHTML = "<sub>(" + data.role + ")</sub>";
+    document.getElementById("rob"+data.divID).style.display = "none";
+})
+
+function initializePlayerBoard(data){
     for (var i = 0; i < data.length-1; i++){
-        var index = (i*3)%8;
+        var index = i;
         if (data[i].name == app.name){
-            app.role = data[i].role;
+            //console.log(data);
+            app.role = data[i].role;    app.id = data[i].id;    app.divID = index;
             document.getElementById("playername"+index).innerHTML = "<b>you</b>";
             document.getElementById("playerrole"+index).innerHTML = "<sub>(" + data[i].role + ")</sub>";
             document.getElementById("playerrole"+index).style.display = "block";
         }
         else{
             document.getElementById("playername"+index).innerHTML = "<b>" + data[i].name + "</b>";
-            document.getElementById("playerrole"+index).innerHTML = " <sub>(" + data[i].role + ")</sub>";
             document.getElementById("playerpeek"+index).style.display = "block";
+            document.getElementById("playerrob"+index).style.display = "block";
+            document.getElementById("peek"+index).setAttribute("alt", data[i].id);
+            document.getElementById("rob"+index).setAttribute("alt", data[i].id);
         }
     }
-    console.log("in the middle: " + data[data.length - 1]);
+    //console.log("in the middle: " + data[data.length - 1]);
     document.getElementsByClassName("bottomleft")[0].innerHTML = "<i>good luck, have fun :)</i><br><strong>role list: </strong>" 
-        + app.roleMatrix[data.length - 1];
-    console.log(data);
-})
+        + app.roleMatrix[data.length-1];
+}
 
 function peekPlayer(thisPlayer){
-    console.log("BUTTON PRESS");
-    var playerRoleID = "playerrole" + thisPlayer.attributes.alt.value;
-    var buttonID = "peek" + thisPlayer.attributes.alt.value;
-    document.getElementById(playerRoleID).style.display = "block";
-    document.getElementById(buttonID).style.display = "none";
+    var divID = thisPlayer.attributes.id.value.charAt(4); //
+    var playerID = thisPlayer.attributes.alt.value;
+    socket.emit("peekRole", {id:playerID, divID:divID, isMid:false});
 }
 
 function peekMid(thisCard){
-    console.log("BUTTON PRESS");
-    var peekedRole = playerData[playerData.length-1][thisCard.attributes.alt.value];
-    document.getElementById("peekCenterRow").innerHTML = "That card was&nbsp;<i>" + peekedRole + "</i>";
+    var playerID = thisCard.attributes.alt.value;
+    socket.emit("peekRole", {id:playerID, isMid:true});
+}
+
+function robPlayer(thisPlayer){
+    var divID = thisPlayer.attributes.id.value.charAt(3);
+    var playerID = thisPlayer.attributes.alt.value;
+    console.log(playerID + "spacespace" + divID);
+    socket.emit("robRole", {id:playerID, divID:divID, myid: app.id, mydivID: app.divID, myrole: app.role});
 }

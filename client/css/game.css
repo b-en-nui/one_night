@@ -42,6 +42,14 @@ div {
 	transform: translate(-50%, -50%);
     position: absolute;
 }
+.centerActionBtn { 
+    z-index: 100;
+    pointer-events:auto;
+}
+.playerActionBtn{
+    z-index:100;
+    pointer-events:auto;
+}
 
 .player_container{
 	position: absolute;
@@ -59,75 +67,83 @@ div {
 }
 
 .player_container.player0{
-	transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%) rotate(180deg);
+    pointer-events:none; 
 }
 .player_container.player1{
-	transform: translate(-50%, -50%) rotate(45deg);
+	transform: translate(-50%, -50%) rotate(225deg);
+    pointer-events:none; 
 }
 .player_container.player2{
-	transform: translate(-50%, -50%) rotate(90deg);
+	transform: translate(-50%, -50%) rotate(270deg);
+    pointer-events:none; 
 }
 .player_container.player3{
-	transform: translate(-50%, -50%) rotate(135deg);
+	transform: translate(-50%, -50%) rotate(315deg);
+    pointer-events:none; 
 }
 .player_container.player4{
-	transform: translate(-50%, -50%) rotate(180deg);
+	transform: translate(-50%, -50%);
+    pointer-events:none; 
 }
 .player_container.player5{
-	transform: translate(-50%, -50%) rotate(225deg);
+	transform: translate(-50%, -50%) rotate(45deg);
+    pointer-events:none; 
 }
 .player_container.player6{
-	transform: translate(-50%, -50%) rotate(270deg);
+    transform: translate(-50%, -50%) rotate(90deg);
+    pointer-events:none; 
 }
 .player_container.player7{
-	transform: translate(-50%, -50%) rotate(315deg);
+	transform: translate(-50%, -50%) rotate(135deg);
+    pointer-events:none; 
 }
 
 
 .player.player0{
-    transform: rotate(0deg);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.player.player1{
-    transform: rotate(-45deg);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.player.player2{
-    transform: rotate(-90deg);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.player.player3{
-    transform: rotate(-135deg);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.player.player4{
     transform: rotate(-180deg);
     display: flex;
     justify-content: center;
     align-items: center;
 }
-.player.player5{
+.player.player1{
     transform: rotate(-225deg);
     display: flex;
     justify-content: center;
     align-items: center;
 }
-.player.player6{
+.player.player2{
     transform: rotate(-270deg);
     display: flex;
     justify-content: center;
     align-items: center;
 }
-.player.player7{
+.player.player3{
     transform: rotate(-315deg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.player.player4{
+    transform: rotate(0deg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.player.player5{
+    transform: rotate(-45deg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.player.player6{
+    transform: rotate(-90deg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.player.player7{
+    transform: rotate(-135deg);
     display: flex;
     justify-content: center;
     align-items: center;
