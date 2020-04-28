@@ -23,6 +23,8 @@ var onLobby = true;
 var onGame = false;
 var shuffledRoles = null;
 var middleRoles = null;
+var troubledQty = 0;
+var troubledPlayers = [];
 
 var roleMatrix = {
     3: ["werewolf","minion","seer","robber","troublemaker","villager"],
@@ -124,12 +126,42 @@ gameio.on('connection', function (socket) {
         PLAYER_LIST[data.id] = robbedPlayer;
         PLAYER_LIST[data.myid] = robberPlayer;
 
-        var temp = shuffledRoles[data.divID];
+        var tempRobbedRole = shuffledRoles[data.divID];
         shuffledRoles[data.divID] = shuffledRoles[data.mydivID];
-        shuffledRoles[data.mydivID] = temp;
+        shuffledRoles[data.mydivID] = tempRobbedRole;
 
         socket.emit("robInfo", {divID:data.divID, mydivID:data.mydivID, role:stolenRole})
     });
+
+    socket.on('troubleRole', function (data) {
+        troubledQty++;
+        troubledPlayers.push(data);
+
+        if (troubledQty == 2){
+            console.log("Switch these folks");
+            var troubledPlayer1 = PLAYER_LIST[troubledPlayers[0].id];
+            var troubledPlayer2 = PLAYER_LIST[troubledPlayers[1].id];
+
+            var switchedRole = troubledPlayer1.role;
+            troubledPlayer1.role = troubledPlayer2.role;
+            troubledPlayer2.role = switchedRole;
+
+            PLAYER_LIST[troubledPlayers[0].id] = troubledPlayer1;
+            PLAYER_LIST[troubledPlayers[1].id] = troubledPlayer2;
+
+            var tempSwitchedRole = shuffledRoles[troubledPlayers[0].divID];
+            shuffledRoles[troubledPlayers[0].divID] = shuffledRoles[troubledPlayers[1].divID];
+            shuffledRoles[troubledPlayers[1].divID] = tempSwitchedRole;
+
+            socket.emit("troubleInfo");
+        }
+
+        else if (troubledQty > 2){
+            console.log("Do nothing");
+        }
+        
+
+    })
 });
 
 // update packets

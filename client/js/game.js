@@ -51,7 +51,7 @@ socket.on("playerInfo", function (data) {
     }
     console.log(frameCount);
     frameCount++;
-    //console.log(data);
+    console.log(data);
 })
 
 
@@ -72,6 +72,12 @@ socket.on("robInfo", function (data) {
     document.getElementById("rob"+data.divID).style.display = "none";
 })
 
+socket.on("troubleInfo", function() {
+    for (var i = 0; i < app.playerCount; i++){
+        document.getElementById("trouble"+i).style.display = "none";
+    }
+})
+
 function initializePlayerBoard(data){
     for (var i = 0; i < data.length-1; i++){
         var index = i;
@@ -86,8 +92,10 @@ function initializePlayerBoard(data){
             document.getElementById("playername"+index).innerHTML = "<b>" + data[i].name + "</b>";
             document.getElementById("playerpeek"+index).style.display = "block";
             document.getElementById("playerrob"+index).style.display = "block";
+            document.getElementById("playertrouble"+index).style.display = "block";
             document.getElementById("peek"+index).setAttribute("alt", data[i].id);
             document.getElementById("rob"+index).setAttribute("alt", data[i].id);
+            document.getElementById("trouble"+index).setAttribute("alt", data[i].id);
         }
     }
     //console.log("in the middle: " + data[data.length - 1]);
@@ -109,6 +117,12 @@ function peekMid(thisCard){
 function robPlayer(thisPlayer){
     var divID = thisPlayer.attributes.id.value.charAt(3);
     var playerID = thisPlayer.attributes.alt.value;
-    console.log(playerID + "spacespace" + divID);
     socket.emit("robRole", {id:playerID, divID:divID, myid: app.id, mydivID: app.divID, myrole: app.role});
+}
+
+function troublePlayer(thisPlayer){
+    var divID = thisPlayer.attributes.id.value.charAt(7);
+    var playerID = thisPlayer.attributes.alt.value;
+    socket.emit("troubleRole", {id:playerID, divID:divID});
+    document.getElementById("trouble"+divID).style.display = "none";
 }
