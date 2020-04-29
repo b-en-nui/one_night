@@ -66,6 +66,12 @@ socket.on("peekInfo", function (data) {
     }
 })
 
+socket.on("drunkInfo", function (data) {
+    app.role = data.newRole;
+    document.getElementById("drunkCenterRow").innerHTML = "That card was&nbsp;<i>" + data.newRole + "</i>";
+    document.getElementById("playerrole"+app.divID).innerHTML = " <sub>(" + data.newRole + ")</sub>";
+})
+
 socket.on("robInfo", function (data) {
     app.role = data.role;
     document.getElementById("playerrole"+data.mydivID).innerHTML = "<sub>(" + data.role + ")</sub>";
@@ -112,6 +118,11 @@ function peekPlayer(thisPlayer){
 function peekMid(thisCard){
     var playerID = thisCard.attributes.alt.value;
     socket.emit("peekRole", {id:playerID, isMid:true});
+}
+
+function drunkMid(thisCard){
+    var cardNum = thisCard.attributes.alt.value;
+    socket.emit("drunkRole", {cardNum:cardNum, id:app.id, divID:app.divID });
 }
 
 function robPlayer(thisPlayer){

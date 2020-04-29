@@ -112,7 +112,18 @@ gameio.on('connection', function (socket) {
             var peekedPlayer = PLAYER_LIST[data.id];
             socket.emit("peekInfo", {player:peekedPlayer, divID:data.divID, isMid:data.isMid});
         }
+    });
 
+    socket.on('drunkRole', function (data) {
+        var drunkedRole = middleRoles[data.cardNum];
+        drunkPlayer = PLAYER_LIST[data.id];
+        var oldRole = drunkPlayer.role;
+        drunkPlayer.role = drunkedRole;
+        middleRoles[data.cardNum] = oldRole;
+        PLAYER_LIST[data.id] = drunkPlayer;
+        shuffledRoles[data.divID] = drunkedRole;
+
+        socket.emit('drunkInfo', {newRole:drunkedRole});
     });
 
     socket.on('robRole', function (data) {
