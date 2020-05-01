@@ -30,3 +30,19 @@ EVERYONE, CLOSE YOUR EYES
 15) Everyone - wake up!
 
 Optional 5-10 minute timer
+
+
+
+
+Final screen:
+
+You win/lose!
+
+The people with the most votes were executed.
+Vote tally:
+player 1
+player 1
+
+The Villager/Werewolf team won because a Werewolf/Role was killed
+
+Reveal cards in the center, reveal final roles

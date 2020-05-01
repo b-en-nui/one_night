@@ -54,7 +54,7 @@ socket.on("playerInfo", function (data) {
             html += "<br>";
         }
     }
-    console.log(data)
+    //console.log(PLAYER_LIST)
     pList.innerHTML = html;
 })
 
@@ -63,11 +63,23 @@ socket.on('redirect', function(destination) {
 });
 
 function setName() {
-    clientName = nameInput.value;
-    socket.emit('setName',{name:clientName});
-    initPrompt.style.display = "none";
-    lobbyMenu.style.display = "block";
-    sessionStorage.clientName = clientName;
+    var nameExists = false;
+    clientName = nameInput.value.toLowerCase();
+    $.each(PLAYER_LIST, function(index, value) {
+        if (value == clientName){
+            nameExists = true;
+        }
+    });
+    
+    if (!nameExists){
+        socket.emit('setName',{name:clientName});
+        initPrompt.style.display = "none";
+        lobbyMenu.style.display = "block";
+        sessionStorage.clientName = clientName;
+    }
+    else{
+        alert("Pick another name");
+    }
 }
 
 function startGame() {

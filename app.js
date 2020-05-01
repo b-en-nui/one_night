@@ -25,6 +25,7 @@ var shuffledRoles = null;
 var middleRoles = null;
 var troubledQty = 0;
 var troubledPlayers = [];
+var finalPlayerCount = null;
 
 var roleMatrix = {
     3: ["werewolf","minion","seer","robber","troublemaker","villager"],
@@ -74,7 +75,7 @@ lobbyio.on('connection', function (socket) {
         }
 
         if (partyReady) {
-            finalPlayerList = PLAYER_LIST;
+            finalPlayerCount = Object.keys(PLAYER_LIST).length;
             for (var i in SOCKET_LIST){
                 var socket = SOCKET_LIST[i];
                 socket.emit('redirect','/game');
@@ -88,8 +89,20 @@ lobbyio.on('connection', function (socket) {
 });
 
 // game code
+var numPlayersInGame = 0;
 gameio.on('connection', function (socket) {
     console.log('player joined the game!')
+    numPlayersInGame++;
+    console.log("numP: " + numPlayersInGame + "|||FPL count: " + finalPlayerCount);
+
+    if (numPlayersInGame == finalPlayerCount){
+        console.log("Starting in 10 seconds :)");
+        function werewolfTurn(){
+            console.log("Werewolves, go. If there is only one werewolf, you may look at a card in the center");
+            socket.emit("turn", {role:"werewolf"})
+        }
+        setTimeout(werewolfTurn,10000);
+    }
 
     socket.on('disconnect',function(){
         console.log('player left the game')
@@ -170,8 +183,36 @@ gameio.on('connection', function (socket) {
         else if (troubledQty > 2){
             console.log("Do nothing");
         }
-        
+    })
 
+    socket.on('turnComplete', function (data) {
+        if (data.role == "werewolf"){
+            console.log("Minions, go. View werewolves");
+            socket.emit("turn", {role:"minion"})
+        }
+        if (data.role == "minion"){
+            console.log("Seer, go. Look at another player's card, or two center cards");
+            socket.emit("turn", {role:"seer"})
+        }
+        if (data.role == "seer"){
+            console.log("Robber, go. Steal another player's card");
+            socket.emit("turn", {role:"robber"})
+        }
+        if (data.role == "robber"){
+            console.log("Troublemaker, go. Switch two player's cards");
+            socket.emit("turn", {role:"troublemaker"})
+        }
+        if (data.role == "troublemaker"){
+            console.log("Drunk, go. Take a card from the middle");
+            socket.emit("turn", {role:"drunk"})
+        }
+        if (data.role == "drunk"){
+            console.log("Insomniac, go. Look at your card.");
+            socket.emit("turn", {role:"insomniac"})
+        }
+        if (data.role == "insomniac"){
+            console.log("Voting time!!!!!!!!!!!!!!!!!!");
+        }
     })
 });
 

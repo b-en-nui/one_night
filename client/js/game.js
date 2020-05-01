@@ -44,7 +44,7 @@ socket.emit("defineSocket", {id:sessionStorage.tabID,name:sessionStorage.clientN
 socket.on("playerInfo", function (data) {
     currentPlayerData = data;
     app.playerCount = data.length;
-    if (frameCount == 0){
+    if (frameCount == 2){ // give time to load
         console.log("Initializing....");
         initializePlayerBoard(data);
         initialPlayerData = data;
@@ -82,6 +82,10 @@ socket.on("troubleInfo", function() {
     for (var i = 0; i < app.playerCount; i++){
         document.getElementById("trouble"+i).style.display = "none";
     }
+})
+
+socket.on("turn", function(data) {
+    socket.emit("turnComplete", data);
 })
 
 function initializePlayerBoard(data){
