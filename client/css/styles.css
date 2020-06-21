@@ -1,0 +1,505 @@
+html {
+  height: 100%;
+}
+body {
+  display:flex;
+  align-items:center;
+  min-height: 100%;
+  font-family: monospace;
+  font-size: 1em;
+}
+div {
+  display : block;
+}
+
+
+
+/* ******************************
+            BUTTONS!
+ ****************************** */
+
+.btn {
+  height: 100%;
+  width: 49%;
+  margin-bottom: 0;
+  color: #D3D3D3;
+  font-family: monospace;
+  font-weight: 700;
+  font-size: 2em;
+  line-height: 1.2;
+  text-align: center;
+  background-color: #2F4F4F;
+  vertical-align: middle;
+  cursor: pointer;
+  border: .1em solid transparent;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+
+.btn:focus {
+  outline: thin dotted #333;
+  outline: 5px auto -webkit-focus-ring-color;
+  outline-offset: -2px;
+}
+
+.btn:hover,
+.btn:focus {
+  color: rgb(247, 111, 111);
+  text-decoration: none;
+}
+
+.btn:active,
+.btn.active {
+  outline: 0;
+  -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+  box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+}
+
+.left {
+  float: left;
+}
+
+.right {
+  float: right;
+}
+
+/* ******************************
+        TITLE SCREEN
+   (intro-screen-template)
+ ****************************** */
+
+#gameArea {
+  height: 100%;
+  width: 100%;
+}
+
+.titleWrapper {
+  font-family: monospace;
+  font-weight: 400;
+  position: absolute;
+  height: 50%;
+  width: 96%;
+  margin: auto;
+  bottom: 0;
+  left: 0;
+  top: 0;
+  right: 0;
+}
+
+.title {
+  text-align: center;
+  font-family: monospace;
+  color: #000000;
+  font-weight: 400;
+  font-size: 8em;
+  margin-top: 0.5em;
+}
+
+.info {
+  color: #000000;
+  font-weight: 400;
+  font-size: 2em;
+  margin-bottom: 1.5em;
+  text-align: center;
+}
+
+.buttons {
+  width: 100%;
+  text-align: center;
+}
+
+/* ******************************
+        START SCREEN
+   (create-game-template)
+ ****************************** */
+
+.createGameWrapper, .gameConfigWrapper, .joinGameWrapper, .gameOver {
+  font-family: monospace;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.createGameWrapper .info, .gameConfigWrapper .info{
+  color: #000000;
+  font-weight: 400;
+  font-size: 2em;
+  margin-top: 1.5em;
+}
+
+.createGameWrapper{
+  color: #000000;
+  font-weight: 300;
+}
+
+.info label {
+  display: block;
+}
+
+.info input {
+  text-align: center;
+  padding: 1em;
+  width: 35%;
+  height: 25%;
+  font-family: monospace;
+  color: #000000;
+  font-weight: 300;
+  font-size: 1em;
+  border: .1em dotted rgb(177, 177, 177);
+  border-radius: 2%;
+  background: transparent;
+}
+
+.info input#inputPlayerName {
+  width: 50%;
+}
+
+
+/* ******************************
+         JOIN SCREEN
+    (join-game-template)
+ ****************************** */
+
+.joinGameWrapper {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  min-height: 320px;
+}
+
+.joinGameWrapper .info {
+  font-size: 1.5em;
+  color: #000000;
+  height: 30%;
+  padding-top: 1%;
+}
+
+.joinGameWrapper .btn {
+  width: 100%;
+  height: 50%;
+}
+
+#playerWaitingMessage {
+  font-size: .8em;
+}
+
+.createGameWrapper #gameURL {
+  font-size: 4em;
+}
+
+.createGameWrapper .gameId {
+  font-size: 8em;
+}
+
+
+
+/* ******************************
+        PLAYER GAME SCREEN
+ ****************************** */
+
+
+#ulAnswers {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+#ulAnswers li {
+  width: 100%;
+  height: 16.6%;
+}
+
+.btnAnswer {
+  width: 100%;
+  border-bottom: 1px dotted white;
+  font-weight: 400;
+  font-size: 3em;
+  color: #000000;
+}
+
+
+
+/* ******************************
+          HOST SCREEN
+     (host-game-template)
+ ****************************** */
+
+/* Absolute Centering: http://coding.smashingmagazine.com/2013/08/09/absolute-horizontal-vertical-centering-css/ */
+#wordArea {
+  font-family: monospace;
+  font-weight: 400;
+  position: absolute;
+  height: 50%;
+  width: 50%;
+  margin: auto;
+  bottom: 0;
+  left: 0;
+  top: 0;
+  right: 0;
+}
+
+#hostWord {
+  height: 100%;
+  width: 100%;
+}
+
+#hostWord h2, #btnPlayerRestart h3 {
+  font-size: 3em;
+  line-height: 1em;
+  font-family: monospace;
+  font-weight: 400;
+  margin: 0;
+  padding: 0;
+  text-transform: uppercase;
+}
+
+#playerScores {
+  height: 10%;
+  width: 100%;
+  position: fixed;
+  top: 0;
+}
+
+.playerScore {
+  width: 50%;
+  padding: 0;
+  margin: 0;
+  font-family: monospace;
+  font-weight: 400;
+  height: 100%;
+}
+
+.playerScore span {
+  display: inline-block;
+  font-size: 1.4EM;
+  padding: 2%;
+  min-width: 10%;
+  margin: 0;
+}
+
+.playerScore .score {
+  text-align: center;
+  background-color: rgb(214, 214, 214);
+}
+
+.playerScore .playerName {
+  width: 77%;
+  background-color: #FFFFFF;
+}
+
+#player1Score {
+  float: left;
+}
+
+#player2Score {
+  float: right;
+  text-align: right;
+}
+
+
+/* ******************************
+        TITLE SCREEN
+   (intro-screen-template)
+ ****************************** */
+
+.gameOver {
+  display: block;
+  height: 20%;
+  padding-top: 10%;
+  font-size: 2em;
+}
+
+.btnGameOver {
+  width: 100%;
+  height: 10%;
+  position: fixed;
+  bottom: 0;
+}
+#tablearea{
+text-align:center;
+width:50%;
+margin:0 auto;
+}
+
+#mid{
+
+margin-top:2%;
+width:100%;
+text-align:center;
+}
+#banner{
+text-align: center;
+font-size: 4em;
+}
+table{
+width:100%;
+}
+tr{
+width:100%;
+}
+td,th{
+width:50%;
+text-align: center;
+border-bottom:0.1em solid black;
+font-size: 2em;
+
+}
+tr:nth-child(even) {
+background: #333300 ;
+color:white;
+}
+tr:nth-child(odd) {
+background: #336600 ;
+color:white;
+}
+
+
+
+/* ******************************
+        Werewolf CSS
+ ****************************** */
+
+
+.topleft {
+  position: absolute;
+  top: 8px;
+  left: 16px;
+  white-space: pre;
+  font-size: 9px;
+}
+.bottomright {
+  position: absolute;
+  bottom: 2px;
+  right: 16px;
+  white-space: pre;
+  font-size: 9px;
+}
+.bottomleft {
+  position: absolute;
+  bottom: 2px;
+  left: 16px;
+}
+.transparent_square{
+width: 100%;
+height: auto;
+}
+
+.central_text{
+left: 50%;
+top: 50%;
+transform: translate(-50%, -50%);
+  position: absolute;
+}
+.peekMid { 
+  z-index: 100;
+  pointer-events:auto;
+}
+.drunkMid { 
+  z-index: 100;
+  pointer-events:auto;
+}
+.playerActionBtn{
+  z-index:100;
+  pointer-events:auto;
+}
+
+.player_container{
+position: absolute;
+left: 50%;
+top: 50%;
+width: 20%;
+transform: translate(-50%, -50%);
+}
+
+.player{
+width: 100%;
+height: auto;
+position: relative;
+left: 175%;
+}
+
+.player_container.player0{
+  transform: translate(-50%, -50%) rotate(180deg);
+  pointer-events:none; 
+}
+.player_container.player1{
+transform: translate(-50%, -50%) rotate(225deg);
+  pointer-events:none; 
+}
+.player_container.player2{
+transform: translate(-50%, -50%) rotate(270deg);
+  pointer-events:none; 
+}
+.player_container.player3{
+transform: translate(-50%, -50%) rotate(315deg);
+  pointer-events:none; 
+}
+.player_container.player4{
+transform: translate(-50%, -50%);
+  pointer-events:none; 
+}
+.player_container.player5{
+transform: translate(-50%, -50%) rotate(45deg);
+  pointer-events:none; 
+}
+.player_container.player6{
+  transform: translate(-50%, -50%) rotate(90deg);
+  pointer-events:none; 
+}
+.player_container.player7{
+transform: translate(-50%, -50%) rotate(135deg);
+  pointer-events:none; 
+}
+
+
+.player.player0{
+  transform: rotate(-180deg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.player.player1{
+  transform: rotate(-225deg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.player.player2{
+  transform: rotate(-270deg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.player.player3{
+  transform: rotate(-315deg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.player.player4{
+  transform: rotate(0deg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.player.player5{
+  transform: rotate(-45deg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.player.player6{
+  transform: rotate(-90deg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.player.player7{
+  transform: rotate(-135deg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
