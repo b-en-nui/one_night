@@ -93,13 +93,14 @@ jQuery(function($){
         },
 
         /**
-         * Both players have joined the game.
+         * All players have joined the game.
          * @param data
          */
         beginNewGame : function(data) {
             console.log('beginNewGame event recieved')
             App.roleList = data.roleList;
             App.origRoleList = data.roleList;
+            App.origPlayerRoles = App.origRoleList.slice(0,App.origRoleList.length-3);
             App.players = data.players;
             App[App.myRole].gameCountdown(data);
         },
@@ -200,8 +201,86 @@ jQuery(function($){
             console.log('\nNew turn!')
             console.log(data);
             data.gameId = App.gameId;
-            if (App.myRole == 'Host'){
-                IO.socket.emit('turnComplete', data);
+            if (App.myRole == 'Player'){
+                document.getElementById("centerMessage").innerHTML = "Hi " + App.Player.initialGameRole + "... You sense " + data.role + " activity<br>";
+            }
+
+            if (data.role == 'werewolf'){
+                var numOfWolves = App.countInArray(App.origPlayerRoles, 'werewolf')
+
+                if (numOfWolves == 0){
+                    console.log('There are zero wolves');
+                    if (App.myRole == 'Host'){
+                        IO.socket.emit('turnComplete', data);
+                    }
+                }
+                if (numOfWolves == 1){
+                    console.log('There is one wolf');
+                    if (App.Player.initialGameRole == 'werewolf'){
+                        // Change HTML
+                        document.getElementById("centerMessage").innerHTML = "You are the only werewolf...<br>Pick a center card to peek<br>";
+                        document.getElementById("peekCenterRow").style.display = "block";
+                        document.getElementById("defaultCenterRow").style.display = "none";
+
+                        // turnComplete will emit after peeking mid
+                    }
+                }
+                if (numOfWolves == 2){
+                    console.log('There are two wolves');
+                    if (App.Player.initialGameRole == 'werewolf'){
+                        document.getElementById("centerMessage").innerHTML = "There are two werewolves! Your partner has been revealed.";
+                        for (var i = 0; i < App.players.length; i++){
+                            if (App.players[i].role == 'werewolf'){
+                                document.getElementById("playerrole"+i).innerHTML = "<sub>(" + App.players[i].role + ")</sub>";
+                                document.getElementById("playerrole"+i).style.display = "block";
+                            }
+                        }
+                    }
+
+                    if (App.myRole == 'Host'){
+                        IO.socket.emit('turnComplete', data);
+                    }
+                }
+            }
+
+            if (data.role == 'minion'){
+                var numOfWolves = App.countInArray(App.origPlayerRoles, 'werewolf');
+                var minionCenterMessages = [
+                    'There are no werewolves to protect :(<br>Try to get yourself killed!',
+                    'There is one werewolf<br>They have been revealed!',
+                    'There are two werewolves<br>They have been revealed!'
+                ]
+                if (App.Player.initialGameRole == 'minion'){
+                    document.getElementById("centerMessage").innerHTML = minionCenterMessages[numOfWolves];
+                    for (var i = 0; i < App.players.length; i++){
+                        if (App.players[i].role == 'werewolf'){
+                            document.getElementById("playerrole"+i).innerHTML = "<sub>(" + App.players[i].role + ")</sub>";
+                            document.getElementById("playerrole"+i).style.display = "block";
+                        }
+                    }
+                }
+                if (App.myRole == 'Host'){
+                    IO.socket.emit('turnComplete', data);
+                }
+            }
+
+            if (data.role == 'seer'){
+                var seerExists = App.countInArray(App.origPlayerRoles, 'seer');
+                if (seerExists == 0 && App.myRole == 'Host'){
+                    IO.socket.emit('turnComplete', data);
+                }
+
+                if (App.Player.initialGameRole == 'seer'){
+                    document.getElementById("centerMessage").innerHTML = 'Seer! You may peek a player card...<br>or two middle cards';
+                    document.getElementById("peekCenterRow").style.display = "block";
+                    document.getElementById("defaultCenterRow").style.display = "none";
+
+                    for (var i = 0; i < App.players.length; i++){
+                        if (App.players[i].role != 'seer'){
+                            document.getElementById("playerpeek"+i).style.display = "block";
+                        }
+                    }
+                }
             }
         }
 
@@ -243,6 +322,11 @@ jQuery(function($){
          * to the array of word data stored on the server.
          */
         currentRound: 0,
+
+        /**
+         * How many times the player has peeked mid (if seer)
+         */
+        midPeeks: 0,
 
         /* *************************************
          *                Setup                *
@@ -706,9 +790,6 @@ jQuery(function($){
                     }
                     else{
                         document.getElementById("playername"+index).innerHTML = "<b>" + App.players[i].playerName + "</b>";
-                        document.getElementById("playerpeek"+index).style.display = "block";
-                        document.getElementById("playerrob"+index).style.display = "block";
-                        document.getElementById("playertrouble"+index).style.display = "block";
                     }
                 }
 
@@ -742,10 +823,12 @@ jQuery(function($){
                 console.log('\nAccessing info:')
 
                 var peekIndex = element.currentTarget.attributes.alt.value;
-                var peekRole = App.players[peekIndex].role
+                var peekRole = App.players[peekIndex].role;
 
                 document.getElementById("playerrole"+peekIndex).innerHTML = "<sub>(" + peekRole + ")</sub>";
                 document.getElementById("playerrole"+peekIndex).style.display = "block";
+
+                IO.socket.emit('turnComplete', {role: App.Player.initialGameRole, gameId: App.gameId});
             },
 
             /**
@@ -797,18 +880,30 @@ jQuery(function($){
              */
             peekMid : function(element) {
                 console.log('Peeking middle...')
-                console.log('\nelement html:')
-                console.log(element)
-                console.log('\nApp html:')
-                console.log(App)
-                console.log('\nAccessing info:')
 
                 var peekIndex = element.currentTarget.attributes.alt.value;
                 var centerOptions = ['Left', 'Middle', 'Right'];
 
-                document.getElementById("peekCenterRow").innerHTML = centerOptions[peekIndex] + ' card is ' + App.roleList[App.roleList.length - 1 - peekIndex];
+                document.getElementById("peekCenterRow").innerHTML += '<br>' + centerOptions[peekIndex] + ' card is ' + App.roleList[App.roleList.length - 1 - peekIndex];
+                //document.getElementById("defaultCenterRow").style.display = "block";
+                
+                if (App.Player.initialGameRole == 'werewolf'){
+                    IO.socket.emit('turnComplete', {role: App.Player.initialGameRole, gameId: App.gameId});
+                }
 
-                console.log(App.roleList);
+                if (App.Player.initialGameRole == 'seer'){
+                    App.midPeeks++;
+                    if (App.midPeeks == 1){
+                        for (var i = 0; i < App.players.length; i++){
+                            if (App.players[i].role != 'seer'){
+                                document.getElementById("playerpeek"+i).style.display = "none";
+                            }
+                        }
+                    }
+                    if (App.midPeeks >= 2){
+                        IO.socket.emit('turnComplete', {role: App.Player.initialGameRole, gameId: App.gameId});
+                    }
+                }
             },
 
             /**
@@ -891,6 +986,19 @@ jQuery(function($){
                     maxFontSize:300
                 }
             );
+        },
+
+        /**
+         * Count instance of item in array
+         */
+        countInArray : function(array, what){
+            var count = 0;
+            for (var i = 0; i < array.length; i++) {
+                if (array[i] === what) {
+                    count++;
+                }
+            }
+            return count;
         }
 
     };
