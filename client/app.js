@@ -139,7 +139,6 @@ jQuery(function($){
 
             if (App.Player.myIndex == data.myIndex){
                 App.Player.gameRole = data.robRole;
-                document.getElementById("centerMessage").innerHTML = "Hello " + App.Player.myName + "!<br>You are a <i>" + App.Player.gameRole + "</i>...<br>";
                 document.getElementById("playerrole"+App.Player.myIndex).innerHTML = "<sub>(" + App.Player.gameRole + ")</sub>";
             }
             if (App.Player.myIndex == data.robIndex){
@@ -202,7 +201,7 @@ jQuery(function($){
             console.log(data);
             data.gameId = App.gameId;
             if (App.myRole == 'Player'){
-                document.getElementById("centerMessage").innerHTML = "Hi " + App.Player.initialGameRole + "... You sense " + data.role + " activity<br>";
+                document.getElementById("centerMessage").innerHTML = "Hi " + App.Player.myName + "... You sense " + data.role + " activity<br>";
             }
 
             if (data.role == 'werewolf'){
@@ -278,6 +277,23 @@ jQuery(function($){
                     for (var i = 0; i < App.players.length; i++){
                         if (App.players[i].role != 'seer'){
                             document.getElementById("playerpeek"+i).style.display = "block";
+                        }
+                    }
+                }
+            }
+
+            if (data.role == 'robber'){
+                var robberExists = App.countInArray(App.origPlayerRoles, 'robber');
+                if (robberExists == 0 && App.myRole == 'Host'){
+                    IO.socket.emit('turnComplete', data);
+                }
+
+                if (App.Player.initialGameRole == 'robber'){
+                    document.getElementById("centerMessage").innerHTML = 'Robber! You may steal a player card...<br>and assume their role';
+
+                    for (var i = 0; i < App.players.length; i++){
+                        if (App.players[i].role != 'robber'){
+                            document.getElementById("playerrob"+i).style.display = "block";
                         }
                     }
                 }
@@ -828,6 +844,14 @@ jQuery(function($){
                 document.getElementById("playerrole"+peekIndex).innerHTML = "<sub>(" + peekRole + ")</sub>";
                 document.getElementById("playerrole"+peekIndex).style.display = "block";
 
+                for (var i = 0; i < App.players.length; i++){
+                    if (App.players[i].role != 'seer'){
+                        document.getElementById("playerpeek"+i).style.display = "none";
+                    }
+                }
+                document.getElementById("peekCenterRow").style.display = "none";
+                document.getElementById("defaultCenterRow").style.display = "block";
+
                 IO.socket.emit('turnComplete', {role: App.Player.initialGameRole, gameId: App.gameId});
             },
 
@@ -847,9 +871,17 @@ jQuery(function($){
                 var myIndex = App.Player.myIndex;
                 var myRole = App.Player.gameRole;
 
+                for (var i = 0; i < App.players.length; i++){
+                    if (App.players[i].role != 'robber'){
+                        document.getElementById("playerrob"+i).style.display = "none";
+                    }
+                }
+
                 var pack = {gameId: App.gameId, robIndex: robIndex, robRole: robRole, myIndex: myIndex, myRole: myRole};
                 console.log(pack);
                 IO.socket.emit('playerRobbed', pack);
+
+                IO.socket.emit('turnComplete', {role: App.Player.initialGameRole, gameId: App.gameId});
             },
 
             /**
@@ -884,10 +916,11 @@ jQuery(function($){
                 var peekIndex = element.currentTarget.attributes.alt.value;
                 var centerOptions = ['Left', 'Middle', 'Right'];
 
-                document.getElementById("peekCenterRow").innerHTML += '<br>' + centerOptions[peekIndex] + ' card is ' + App.roleList[App.roleList.length - 1 - peekIndex];
-                //document.getElementById("defaultCenterRow").style.display = "block";
+                document.getElementById("peekCenterRow").insertAdjacentHTML('afterend', '<br>' + centerOptions[peekIndex] + ' card is ' + App.roleList[App.roleList.length - 1 - peekIndex]);
                 
                 if (App.Player.initialGameRole == 'werewolf'){
+                    document.getElementById("peekCenterRow").style.display = "none";
+                    document.getElementById("defaultCenterRow").style.display = "block";
                     IO.socket.emit('turnComplete', {role: App.Player.initialGameRole, gameId: App.gameId});
                 }
 
@@ -901,6 +934,9 @@ jQuery(function($){
                         }
                     }
                     if (App.midPeeks >= 2){
+                        document.getElementById("peekCenterRow").style.display = "none";
+                        document.getElementById("defaultCenterRow").style.display = "block";
+
                         IO.socket.emit('turnComplete', {role: App.Player.initialGameRole, gameId: App.gameId});
                     }
                 }
