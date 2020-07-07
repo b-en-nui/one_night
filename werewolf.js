@@ -10,6 +10,9 @@ var roleMatrix = {
     '7': ["werewolf","werewolf","minion","seer","robber","troublemaker","drunk","insomniac","tanner","villager"],
     '8': ["werewolf","werewolf","minion","seer","robber","troublemaker","drunk","insomniac","tanner","villager","villager"]
 }
+
+var voteStore = {};
+
 /**
  * This function is called by app.js to initialize a new game instance.
  *
@@ -29,7 +32,7 @@ exports.initGame = function(sio, socket, sdb){
     gameSocket.on('hostCreateNewGame', hostCreateNewGame);
     gameSocket.on('hostRoomFull', hostPrepareGame);
     gameSocket.on('hostCountdownFinished', hostStartGame);
-    gameSocket.on('hostNextRound', hostNextRound);
+    gameSocket.on('updateHST', updateHST);
 
     // Player Events
     gameSocket.on('playerJoinGame', playerJoinGame);
@@ -39,6 +42,7 @@ exports.initGame = function(sio, socket, sdb){
     gameSocket.on('playersTroubled', playersTroubled);
     gameSocket.on('middleDrunked', middleDrunked);
     gameSocket.on('turnComplete', playerTurnComplete);
+    gameSocket.on('voted', processVote);
 }
 
 /* *******************************
@@ -98,29 +102,20 @@ function hostStartGame(gameId) {
  * A player answered correctly. Time for the next word.
  * @param data Sent from the client. Contains the current round and gameId (room)
  */
-function hostNextRound(data) {
-    if(data.round < wordPool.length ){
-        // Send a new set of words back to the host and players.
-        //sendWord(data.round, data.gameId);
-    } else {
-
-      if(!data.done)
-      {
-        //updating players win count
-        db.all("SELECT * FROM player WHERE player_name=?",data.winner, function(err, rows) {
+function updateHST(winningPlayer) {
+    //updating players win count
+    console.log('Updating HST with ' + winningPlayer);
+    db.all("SELECT * FROM player WHERE player_name=?",winningPlayer, function(err, rows) {
         rows.forEach(function (row) {
             win=row.player_win;
             win++;
             console.log(win);
-            db.run("UPDATE player SET player_win = ? WHERE player_name = ?", win, data.winner);
+            db.run("UPDATE player SET player_win = ? WHERE player_name = ?", win, winningPlayer);
             console.log(row.player_name, row.player_win);
         })
-        });
-        data.done++;
-      }
-        // If the current round exceeds the number of words, send the 'gameOver' event.
-      io.sockets.in(data.gameId).emit('gameOver',data);
-    }
+    });
+    // If the current round exceeds the number of words, send the 'gameOver' event.
+    //io.sockets.in(data.gameId).emit('gameOver',data);
 }
 
 // function for finding leader
@@ -282,7 +277,54 @@ function playerTurnComplete(data){
         io.sockets.in(data.gameId).emit("turn", {role:"insomniac"})
     }
     if (data.role == "insomniac"){
-        console.log("Voting time!!!!!!!!!!!!!!!!!!");
+        console.log("Voting time!");
+        io.sockets.in(data.gameId).emit("startVoting")
+    }
+}
+
+/**
+ * 
+ * @param {*} data 
+ */
+function processVote(data){
+    // if no votes in votestore correspond to gameID, create new key
+    if (!(data.gameId in voteStore)){
+        voteStore[data.gameId] = [data.vote];
+    }
+    else{
+        voteStore[data.gameId].push(data.vote);
+    }
+
+    // if len array == len in data, process votes
+    if (voteStore[data.gameId].length == data.playerCount){
+        console.log('Voting done - time to process!');
+        var distribution = {},
+            max = 0,
+            result = [];
+    
+        voteStore[data.gameId].forEach(function (a) {
+            distribution[a] = (distribution[a] || 0) + 1;
+            if (distribution[a] > max) {
+                max = distribution[a];
+                result = [a];
+                return;
+            }
+            if (distribution[a] === max) {
+                result.push(a);
+            }
+        });
+        console.log('\nVoting distribution')
+        console.log(distribution);
+        console.log('\nVoting max')
+        console.log(max);
+        console.log('\nVoting result')
+        console.log(result);
+
+        // send results to all players
+        io.sockets.in(data.gameId).emit("voteResults", {distribution: distribution, max: max, result: result});
+
+        // delete voteStore kvp for gameId
+        delete voteStore[data.gameId];
     }
 }
 

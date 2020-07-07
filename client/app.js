@@ -37,6 +37,8 @@ jQuery(function($){
             IO.socket.on('midDrunkInfo', IO.updateMidDrunkInfo);
 
             IO.socket.on('turn', IO.newTurn);
+            IO.socket.on('startVoting', IO.startVoting);
+            IO.socket.on('voteResults', IO.voteResults)
         },
 
         /**
@@ -298,6 +300,157 @@ jQuery(function($){
                     }
                 }
             }
+
+            if (data.role == 'troublemaker'){
+                var tmExists = App.countInArray(App.origPlayerRoles, 'troublemaker');
+                if (tmExists == 0 && App.myRole == 'Host'){
+                    IO.socket.emit('turnComplete', data);
+                }
+
+                if (App.Player.initialGameRole == 'troublemaker'){
+                    document.getElementById("centerMessage").innerHTML = 'Troublemaker! You may switch two player\'s cards...';
+
+                    for (var i = 0; i < App.players.length; i++){
+                        if (App.players[i].role != 'troublemaker'){
+                            document.getElementById("playertrouble"+i).style.display = "block";
+                        }
+                    }
+                }
+            }
+
+            if (data.role == 'drunk'){
+                var drunkExists = App.countInArray(App.origPlayerRoles, 'drunk');
+                if (drunkExists == 0 && App.myRole == 'Host'){
+                    IO.socket.emit('turnComplete', data);
+                }
+
+                if (App.Player.initialGameRole == 'drunk'){
+                    document.getElementById("centerMessage").innerHTML = 'Drunk! Take a card from the middle...';
+                    document.getElementById("drunkCenterRow").style.display = "block";
+                    document.getElementById("defaultCenterRow").style.display = "none";
+                }
+            }
+
+            if (data.role == 'insomniac'){
+                var insomniacExists = App.countInArray(App.origPlayerRoles, 'insomniac');
+                if (insomniacExists == 0 && App.myRole == 'Host'){
+                    IO.socket.emit('turnComplete', data);
+                }
+
+                if (App.Player.initialGameRole == 'insomniac'){
+                    document.getElementById("centerMessage").innerHTML = 'Insomniac! Your current role is ' + App.players[App.Player.myIndex].role + '.';
+
+                    document.getElementById("playerrole"+App.Player.myIndex).innerHTML = "<sub>(" + App.players[App.Player.myIndex].role + ")</sub>";
+                    document.getElementById("playerrole"+App.Player.myIndex).style.display = "block";
+
+                    IO.socket.emit('turnComplete', data);
+                }
+            }
+        },
+
+        startVoting : function() {
+            if (App.myRole == 'Player'){
+                console.log('Start voting!')
+                document.getElementById("centerMessage").innerHTML = "Hi " + App.Player.myName + ", it is time to vote!<br>Vote for the player who you think<br>is the <i>werewolf</i>";
+                for (var i = 0; i < App.players.length; i++){
+                    document.getElementById("playervote"+i).style.display = "block";
+                }
+            }
+        },
+
+        // <div id="resultsDistribution"></div>
+        // <div id="resultsResult"></div>
+        // <div id="resultsWinner"></div>
+
+        voteResults : function(data) {
+            if (App.myRole == 'Player'){
+                console.log(data)
+                $('#gameArea').html(App.$templateGameResult);
+                var werewolvesWin = true;
+                var tannerWins = false;
+
+                // handle distribution
+                var distributionHTML = 'Vote distribution:<br>';
+                for (var key in data.distribution) {
+                    if (data.distribution.hasOwnProperty(key)) {
+                        distributionHTML += App.players[key].playerName + " received " + data.distribution[key] + ' votes<br>';
+                    }
+                }
+                distributionHTML += '<br>';
+                $('#resultsDistribution').html(distributionHTML);
+
+                // handle result
+                var resultHTML = 'The party voted to kill ';
+                if (data.result.length > 1){
+                    resultHTML += 'the following:<ul>'
+                    for (var p in data.result){
+                        resultHTML += '<li>' + App.players[data.result[p]].playerName + ' the ' + App.players[data.result[p]].role + '</li>';
+                        if (App.players[data.result[p]].role == 'werewolf'){
+                            werewolvesWin = false;
+                        }
+                        if (App.players[data.result[p]].role == 'tanner'){
+                            tannerWins = true;
+                        }
+                    }
+                    resultHTML += '</ul>'
+                    
+                }
+                else if (data.result.length <= 1){
+                    resultHTML += App.players[data.result[0]].playerName + ' the ' + App.players[data.result[0]].role + '<br>'
+                    if (App.players[data.result[0]].role == 'werewolf'){
+                        werewolvesWin = false;
+                    }
+                    if (App.players[data.result[0]].role == 'tanner'){
+                        tannerWins = true;
+                    }
+                }
+                $('#resultsResult').html(resultHTML);
+
+                // handle winner
+                var winnerHTML = '';
+                if (tannerWins){
+                    winnerHTML = 'Tanner wins!';
+                    if (App.Player.gameRole == 'tanner'){
+                        winnerHTML += '<br>Congrats :)'
+                        IO.socket.emit('hostNextRound',App.Player.myName);
+                    }
+                    else{
+                        winnerHTML += '<br>You lose :('
+                    }
+                }
+                else if (werewolvesWin){
+                    winnerHTML = 'Werewolf team wins!';
+                    if (App.Player.gameRole == 'werewolf' || App.Player.gameRole == 'minion'){
+                        winnerHTML += '<br>Congrats :)'
+                        IO.socket.emit('hostNextRound',App.Player.myName);
+                    }
+                    else{
+                        winnerHTML += '<br>You lose :('
+                    }
+                }
+                else{
+                    winnerHTML = 'Villagers win!';
+                    if (!(App.Player.gameRole == 'werewolf' || App.Player.gameRole == 'minion' || App.Player.gameRole == 'tanner')){
+                        winnerHTML += '<br>Congrats :)'
+                        IO.socket.emit('updateHST',App.Player.myName);
+                    }
+                    else{
+                        winnerHTML += '<br>You lose :('
+                    }
+                }
+                $('#resultsWinner').html(winnerHTML);
+
+                // handle game info
+                var gameInfoHTML = '<br><br>';
+                var origPlayerHTML = 'Initial: ';
+                var finalPlayerHTML = 'Final: ';
+                for (var i = 0; i < App.origPlayerRoles.length; i++){
+                    origPlayerHTML += App.players[i].playerName + '=' + App.origPlayerRoles[i] + '\t'
+                    finalPlayerHTML += App.players[i].playerName + '=' + App.players[i].role + '\t'
+                }
+                gameInfoHTML += origPlayerHTML + '<br>' + finalPlayerHTML + '<br><br>Refresh to start a new game';
+                $('#resultsGameInfo').html(gameInfoHTML);
+            }
         }
 
     };
@@ -375,6 +528,7 @@ jQuery(function($){
             App.$hostGame = $('#host-game-template').html();
             App.$leaderGame = $('#leaderboard-template').html();
             App.$playerView = $('#player-view-template').html();
+            App.$templateGameResult = $('#player-result-template').html();
         },
 
         /**
@@ -397,6 +551,7 @@ jQuery(function($){
             App.$doc.on('click', '.peekPlayer', App.Player.peekPlayer);
             App.$doc.on('click', '.robPlayer', App.Player.robPlayer);
             App.$doc.on('click', '.troublePlayer', App.Player.troublePlayer);
+            App.$doc.on('click', '.votePlayer', App.Player.votePlayer);
             App.$doc.on('click', '.peekMid', App.Player.peekMid);
             App.$doc.on('click', '.drunkMid', App.Player.drunkMid);
         },
@@ -422,7 +577,6 @@ jQuery(function($){
         onBackClick : function()
         {
           App.$gameArea.html(App.$templateIntroScreen);
-          App.doTextFit('.title');
         },
         /* *******************************
            *         HOST CODE           *
@@ -904,6 +1058,25 @@ jQuery(function($){
                     console.log('Players selected - time to trouble...')
                     var pack = {gameId: App.gameId, troubledPlayers: App.troubledPlayers}
                     IO.socket.emit('playersTroubled', pack);
+                    for (var i = 0; i < App.players.length; i++){
+                        document.getElementById("playertrouble"+i).style.display = "none";
+                    }
+                    IO.socket.emit('turnComplete', {role: App.Player.initialGameRole, gameId: App.gameId});
+                }
+            },
+
+            /**
+             * Vote for a player to die
+             * 
+             */
+            votePlayer : function(element) {
+                console.log('\nYou have voted for...')
+                console.log(element)
+
+                IO.socket.emit('voted', {vote: element.currentTarget.attributes.alt.value, gameId: App.gameId, playerCount: App.players.length});
+
+                for (var i = 0; i < App.players.length; i++){
+                    document.getElementById("vote"+i).disabled = "true";
                 }
             },
 
@@ -961,6 +1134,8 @@ jQuery(function($){
                 var pack = {gameId: App.gameId, drunkIndex: drunkIndex, drunkRole: drunkRole, myIndex: myIndex, myRole: myRole};
                 console.log(pack);
                 IO.socket.emit('middleDrunked', pack);
+
+                IO.socket.emit('turnComplete', {role: App.Player.initialGameRole, gameId: App.gameId});
             }
         },
 

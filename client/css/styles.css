@@ -348,11 +348,11 @@ font-size: 2em;
 
 }
 tr:nth-child(even) {
-background: #333300 ;
+background: #1f0000 ;
 color:white;
 }
 tr:nth-child(odd) {
-background: #336600 ;
+background: #412627 ;
 color:white;
 }
 
