@@ -212,7 +212,7 @@ jQuery(function($){
                 if (numOfWolves == 0){
                     console.log('There are zero wolves');
                     if (App.myRole == 'Host'){
-                        IO.socket.emit('turnComplete', data);
+                        setTimeout(function(){IO.socket.emit('turnComplete', data)}, 12000);
                     }
                 }
                 if (numOfWolves == 1){
@@ -261,14 +261,14 @@ jQuery(function($){
                     }
                 }
                 if (App.myRole == 'Host'){
-                    IO.socket.emit('turnComplete', data);
+                    setTimeout(function(){IO.socket.emit('turnComplete', data)}, 12000);
                 }
             }
 
             if (data.role == 'seer'){
                 var seerExists = App.countInArray(App.origPlayerRoles, 'seer');
                 if (seerExists == 0 && App.myRole == 'Host'){
-                    IO.socket.emit('turnComplete', data);
+                    setTimeout(function(){IO.socket.emit('turnComplete', data)}, 12000);
                 }
 
                 if (App.Player.initialGameRole == 'seer'){
@@ -287,7 +287,7 @@ jQuery(function($){
             if (data.role == 'robber'){
                 var robberExists = App.countInArray(App.origPlayerRoles, 'robber');
                 if (robberExists == 0 && App.myRole == 'Host'){
-                    IO.socket.emit('turnComplete', data);
+                    setTimeout(function(){IO.socket.emit('turnComplete', data)}, 12000);
                 }
 
                 if (App.Player.initialGameRole == 'robber'){
@@ -304,7 +304,7 @@ jQuery(function($){
             if (data.role == 'troublemaker'){
                 var tmExists = App.countInArray(App.origPlayerRoles, 'troublemaker');
                 if (tmExists == 0 && App.myRole == 'Host'){
-                    IO.socket.emit('turnComplete', data);
+                    setTimeout(function(){IO.socket.emit('turnComplete', data)}, 12000);
                 }
 
                 if (App.Player.initialGameRole == 'troublemaker'){
@@ -321,7 +321,7 @@ jQuery(function($){
             if (data.role == 'drunk'){
                 var drunkExists = App.countInArray(App.origPlayerRoles, 'drunk');
                 if (drunkExists == 0 && App.myRole == 'Host'){
-                    IO.socket.emit('turnComplete', data);
+                    setTimeout(function(){IO.socket.emit('turnComplete', data)}, 12000);
                 }
 
                 if (App.Player.initialGameRole == 'drunk'){
@@ -334,7 +334,7 @@ jQuery(function($){
             if (data.role == 'insomniac'){
                 var insomniacExists = App.countInArray(App.origPlayerRoles, 'insomniac');
                 if (insomniacExists == 0 && App.myRole == 'Host'){
-                    IO.socket.emit('turnComplete', data);
+                    setTimeout(function(){IO.socket.emit('turnComplete', data)}, 12000);
                 }
 
                 if (App.Player.initialGameRole == 'insomniac'){
@@ -343,7 +343,7 @@ jQuery(function($){
                     document.getElementById("playerrole"+App.Player.myIndex).innerHTML = "<sub>(" + App.players[App.Player.myIndex].role + ")</sub>";
                     document.getElementById("playerrole"+App.Player.myIndex).style.display = "block";
 
-                    IO.socket.emit('turnComplete', data);
+                    setTimeout(function(){IO.socket.emit('turnComplete', data)}, 12000);
                 }
             }
         },
