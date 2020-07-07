@@ -2,7 +2,7 @@
   "name": "onenight",
   "version": "1.0.0",
   "description": "Multiplayer online social deduction game",
-  "main": "app.js",
+  "main": "index.js",
   "dependencies": {
     "express": "^4.17.1",
     "jquery": "^3.5.0",
