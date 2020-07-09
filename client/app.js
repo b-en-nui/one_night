@@ -202,8 +202,13 @@ jQuery(function($){
             console.log('\nNew turn!')
             console.log(data);
             data.gameId = App.gameId;
-            if (App.myRole == 'Player'){
+            var roleExists = App.countInArray(App.origRoleList, data.role);
+
+            if (roleExists > 0 && App.myRole == 'Player'){
                 document.getElementById("centerMessage").innerHTML = "Hi " + App.Player.myName + "... You sense " + data.role + " activity<br>";
+            }
+            if (roleExists == 0){
+                IO.socket.emit('turnComplete', data);
             }
 
             if (data.role == 'werewolf'){
@@ -963,6 +968,20 @@ jQuery(function($){
                     }
                 }
 
+                document.getElementById("bottomLeftName").innerHTML += App.Player.myName;
+                document.getElementById("bottomLeftRole").innerHTML += App.Player.initialGameRole;
+                document.getElementById("bottomLeftRoles").innerHTML += App.shuffle(App.origRoleList).join(', ');
+
+                if (App.Player.initialGameRole == 'werewolf' || App.Player.initialGameRole == 'minion'){
+                    document.getElementById("bottomLeftGoal").innerHTML += 'have all werewolves survive the night. Minion death means you win!'
+                }
+                else if (App.Player.initialGameRole == 'tanner'){
+                    document.getElementById("bottomLeftGoal").innerHTML += 'die. Try to shift blame towards you!'
+                }
+                else{
+                    document.getElementById("bottomLeftGoal").innerHTML += 'kill the werewolf! Try to determine who\'s story does not match up.'
+                }
+
                 console.log(App)
             },
 
@@ -1210,6 +1229,27 @@ jQuery(function($){
                 }
             }
             return count;
+        },
+
+        shuffle : function(array){
+            var currentIndex = array.length;
+            var temporaryValue;
+            var randomIndex;
+
+            // While there remain elements to shuffle...
+            while (0 !== currentIndex) {
+
+                // Pick a remaining element...
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex -= 1;
+
+                // And swap it with the current element.
+                temporaryValue = array[currentIndex];
+                array[currentIndex] = array[randomIndex];
+                array[randomIndex] = temporaryValue;
+            }
+
+            return array;
         }
 
     };

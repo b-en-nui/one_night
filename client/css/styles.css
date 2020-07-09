@@ -381,6 +381,8 @@ color:white;
   position: absolute;
   bottom: 2px;
   left: 16px;
+  font-size: 10px;
+  z-index: 100;
 }
 .transparent_square{
 width: 100%;
