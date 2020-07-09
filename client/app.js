@@ -159,6 +159,13 @@ jQuery(function($){
             App.players[data.troubledPlayers[0].troubleIndex].role = data.troubledPlayers[1].troubleRole;
             App.players[data.troubledPlayers[1].troubleIndex].role = data.troubledPlayers[0].troubleRole;
 
+            if (App.Player.myIndex == data.troubledPlayers[0].troubleIndex){
+                App.Player.gameRole = data.troubledPlayers[1].troubleRole;
+            }
+            if (App.Player.myIndex == data.troubledPlayers[1].troubleIndex){
+                App.Player.gameRole = data.troubledPlayers[0].troubleRole;
+            }
+
             console.log('\nUpdated App HTML:');
             console.log(App);
         },
@@ -205,13 +212,13 @@ jQuery(function($){
             var roleExists = App.countInArray(App.origRoleList, data.role);
 
             if (roleExists > 0 && App.myRole == 'Player'){
-                document.getElementById("centerMessage").innerHTML = "Hi " + App.Player.myName + "... You sense " + data.role + " activity<br>";
+                document.getElementById("centerMessage").innerHTML = "Hi " + App.Player.myName + "... It is the " + data.role + "\'s turn<br>";
             }
-            if (roleExists == 0){
+            if (roleExists == 0 && App.myRole == 'Host'){
                 IO.socket.emit('turnComplete', data);
             }
 
-            if (data.role == 'werewolf'){
+            if (roleExists > 0 && data.role == 'werewolf'){
                 var numOfWolves = App.countInArray(App.origPlayerRoles, 'werewolf')
 
                 if (numOfWolves == 0){
@@ -249,7 +256,7 @@ jQuery(function($){
                 }
             }
 
-            if (data.role == 'minion'){
+            if (roleExists > 0 && data.role == 'minion'){
                 var numOfWolves = App.countInArray(App.origPlayerRoles, 'werewolf');
                 var minionCenterMessages = [
                     'There are no werewolves to protect :(<br>Try to get yourself killed!',
@@ -270,7 +277,7 @@ jQuery(function($){
                 }
             }
 
-            if (data.role == 'seer'){
+            if (roleExists > 0 && data.role == 'seer'){
                 var seerExists = App.countInArray(App.origPlayerRoles, 'seer');
                 if (seerExists == 0 && App.myRole == 'Host'){
                     setTimeout(function(){IO.socket.emit('turnComplete', data)}, 12000);
@@ -289,7 +296,7 @@ jQuery(function($){
                 }
             }
 
-            if (data.role == 'robber'){
+            if (roleExists > 0 && data.role == 'robber'){
                 var robberExists = App.countInArray(App.origPlayerRoles, 'robber');
                 if (robberExists == 0 && App.myRole == 'Host'){
                     setTimeout(function(){IO.socket.emit('turnComplete', data)}, 12000);
@@ -306,7 +313,7 @@ jQuery(function($){
                 }
             }
 
-            if (data.role == 'troublemaker'){
+            if (roleExists > 0 && data.role == 'troublemaker'){
                 var tmExists = App.countInArray(App.origPlayerRoles, 'troublemaker');
                 if (tmExists == 0 && App.myRole == 'Host'){
                     setTimeout(function(){IO.socket.emit('turnComplete', data)}, 12000);
@@ -323,7 +330,7 @@ jQuery(function($){
                 }
             }
 
-            if (data.role == 'drunk'){
+            if (roleExists > 0 && data.role == 'drunk'){
                 var drunkExists = App.countInArray(App.origPlayerRoles, 'drunk');
                 if (drunkExists == 0 && App.myRole == 'Host'){
                     setTimeout(function(){IO.socket.emit('turnComplete', data)}, 12000);
@@ -336,7 +343,7 @@ jQuery(function($){
                 }
             }
 
-            if (data.role == 'insomniac'){
+            if (roleExists > 0 && data.role == 'insomniac'){
                 var insomniacExists = App.countInArray(App.origPlayerRoles, 'insomniac');
                 if (insomniacExists == 0 && App.myRole == 'Host'){
                     setTimeout(function(){IO.socket.emit('turnComplete', data)}, 12000);
@@ -417,7 +424,7 @@ jQuery(function($){
                     winnerHTML = 'Tanner wins!';
                     if (App.Player.gameRole == 'tanner'){
                         winnerHTML += '<br>Congrats :)'
-                        IO.socket.emit('hostNextRound',App.Player.myName);
+                        IO.socket.emit('updateHST',App.Player.myName);
                     }
                     else{
                         winnerHTML += '<br>You lose :('
@@ -427,7 +434,7 @@ jQuery(function($){
                     winnerHTML = 'Werewolf team wins!';
                     if (App.Player.gameRole == 'werewolf' || App.Player.gameRole == 'minion'){
                         winnerHTML += '<br>Congrats :)'
-                        IO.socket.emit('hostNextRound',App.Player.myName);
+                        IO.socket.emit('updateHST',App.Player.myName);
                     }
                     else{
                         winnerHTML += '<br>You lose :('
@@ -970,7 +977,7 @@ jQuery(function($){
 
                 document.getElementById("bottomLeftName").innerHTML += App.Player.myName;
                 document.getElementById("bottomLeftRole").innerHTML += App.Player.initialGameRole;
-                document.getElementById("bottomLeftRoles").innerHTML += App.shuffle(App.origRoleList).join(', ');
+                document.getElementById("bottomLeftRoles").innerHTML += App.shuffle(Array.from(App.origRoleList)).join(', ');
 
                 if (App.Player.initialGameRole == 'werewolf' || App.Player.initialGameRole == 'minion'){
                     document.getElementById("bottomLeftGoal").innerHTML += 'have all werewolves survive the night. Minion death means you win!'
@@ -1153,6 +1160,9 @@ jQuery(function($){
                 var pack = {gameId: App.gameId, drunkIndex: drunkIndex, drunkRole: drunkRole, myIndex: myIndex, myRole: myRole};
                 console.log(pack);
                 IO.socket.emit('middleDrunked', pack);
+
+                document.getElementById("drunkCenterRow").style.display = "none";
+                document.getElementById("defaultCenterRow").style.display = "block";
 
                 IO.socket.emit('turnComplete', {role: App.Player.initialGameRole, gameId: App.gameId});
             }
