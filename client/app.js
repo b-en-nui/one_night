@@ -181,8 +181,8 @@ jQuery(function($){
 
             if (App.Player.myIndex == data.myIndex){
                 App.Player.gameRole = data.drunkRole;
-                document.getElementById("centerMessage").innerHTML = "Hello " + App.Player.myName + "!<br>You are a <i>" + App.Player.gameRole + "</i>...<br>";
-                document.getElementById("playerrole"+App.Player.myIndex).innerHTML = "<sub>(" + App.Player.gameRole + ")</sub>";
+                // Update this to say 'You took the x card'
+                //document.getElementById("centerMessage").innerHTML = "Hello " + App.Player.myName + "!<br>You are a <i>" + App.Player.gameRole + "</i>...<br>";
             }
 
             console.log('\nUpdated App HTML:');
