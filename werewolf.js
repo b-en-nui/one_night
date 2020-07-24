@@ -196,17 +196,6 @@ function playerJoinGame(data) {
     }
 }
 
-/**
- * A player has tapped a word in the word list.
- * @param data gameId
- */
-function playerAnswer(data) {
-    // console.log('Player ID: ' + data.playerId + ' answered a question with: ' + data.answer);
-
-    // The player's answer is attached to the data object.  \
-    // Emit an event with the answer so it can be checked by the 'Host'
-    io.sockets.in(data.gameId).emit('hostCheckAnswer', data);
-}
 
 /**
  * The game is over, and a player has clicked a button to restart the game.
@@ -344,8 +333,6 @@ function startGame(gameId) {
     io.sockets.in(gameId).emit('startGame', data);
     io.sockets.in(gameId).emit('turn', {role:"werewolf"})
 }
-
-
 
 /*
  * Javascript implementation of Fisher-Yates shuffle algorithm

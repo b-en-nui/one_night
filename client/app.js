@@ -4,8 +4,6 @@ jQuery(function($){
 
     /**
      * All the code relevant to Socket.IO is collected in the IO namespace.
-     *
-     * @type {{init: Function, bindEvents: Function, onConnected: Function, onNewGameCreated: Function, playerJoinedRoom: Function, beginNewGame: Function, onNewWordData: Function, hostCheckAnswer: Function, gameOver: Function, error: Function}}
      */
     var IO = {
 
@@ -118,16 +116,6 @@ jQuery(function($){
 
             // Change the word for the Host and Player
             App[App.myRole].setGameBoard(data);
-        },
-
-        /**
-         * A player answered. If this is the host, check the answer.
-         * @param data
-         */
-        hostCheckAnswer : function(data) {
-            if(App.myRole === 'Host') {
-                App.Host.checkAnswer(data);
-            }
         },
 
         /**
@@ -573,7 +561,7 @@ jQuery(function($){
          * *********************************** */
 
         /**
-         * Show the initial Anagrammatix Title Screen
+         * Show the initial One Night Title Screen
          * (with Start and Join buttons)
          */
         showInitScreen: function() {
@@ -723,7 +711,7 @@ jQuery(function($){
             },
 
             /**
-             * Show the word for the current round on screen.
+             * Set the game board
              * @param data{{round: *, word: *, answer: *, list: Array}}
              */
             setGameBoard : function(data) {
@@ -739,86 +727,7 @@ jQuery(function($){
             },
 
             /**
-             * Check the answer clicked by a player.
-             * @param data{{round: *, playerId: *, answer: *, gameId: *}}
-             */
-            checkAnswer : function(data) {
-                // Verify that the answer clicked is from the current round.
-                // This prevents a 'late entry' from a player whos screen has not
-                // yet updated to the current round.
-                if (data.round === App.currentRound){
-
-                    // Get the player's score
-                    var $pScore = $('#' + data.playerId);
-
-                    // Advance player's score if it is correct
-                    if( App.Host.currentCorrectAnswer === data.answer ) {
-                        // Add 5 to the player's score
-                        $pScore.text( +$pScore.text() + 5 );
-
-                        // Advance the round
-                        App.currentRound += 1;
-
-                        // Prepare data to send to the server
-                        var data = {
-                            gameId : App.gameId,
-                            round : App.currentRound
-                        }
-
-                        // Notify the server to start the next round.
-                        IO.socket.emit('hostNextRound',data);
-
-                    } else {
-                        // A wrong answer was submitted, so decrement the player's score.
-                        $pScore.text( +$pScore.text() - 3 );
-                    }
-                }
-            },
-
-
-            /**
-             * All 10 rounds have played out. End the game.
-             * @param data
-             */
-            endGame : function(data) {
-                // Get the data for player 1 from the host screen
-                var $p1 = $('#player1Score');
-                var p1Score = +$p1.find('.score').text();
-                var p1Name = $p1.find('.playerName').text();
-
-                // Get the data for player 2 from the host screen
-                var $p2 = $('#player2Score');
-                var p2Score = +$p2.find('.score').text();
-                var p2Name = $p2.find('.playerName').text();
-
-                // Find the winner based on the scores
-                var winner = (p1Score < p2Score) ? p2Name : p1Name;
-                var tie = (p1Score === p2Score);
-
-                // Display the winner (or tie game message)
-                if(tie){
-                    $('#countdown').text("It's a Tie!");
-                } else {
-                    $('#countdown').text( winner + ' Wins!!' );
-                }
-                App.doTextFit('#countdown');
-                data.winner=winner;
-                if(data.done>0)
-                {
-
-                }
-                else data.done=0;
-                //console.log(data);
-                //IO.socket.emit("clientEndGame",data);
-                // Reset game data
-                App.Host.numPlayersInRoom = 0;
-                App.Host.isNewGame = true;
-                IO.socket.emit('hostNextRound',data);
-                // Reset game data
-            },
-
-            /**
-             * A player hit the 'Start Again' button after the end of a game.
+             * A player hit the 'Start Again' button after the end of a game. (Not currently implemented)
              */
             restartGame : function() {
                 App.$gameArea.html(App.$templateNewGame);
