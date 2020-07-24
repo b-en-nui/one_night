@@ -542,7 +542,6 @@ jQuery(function($){
             // Player
             App.$doc.on('click', '#btnJoinGame', App.Player.onJoinClick);
             App.$doc.on('click', '#btnStart',App.Player.onPlayerStartClick);
-            App.$doc.on('click', '.btnAnswer',App.Player.onPlayerAnswerClick);
             App.$doc.on('click', '#btnPlayerRestart', App.Player.onPlayerRestart);
             App.$doc.on('click', '#leaderboard', App.onLeaderboardClick);
             App.$doc.on('click', '#back', App.onBackClick);
@@ -796,25 +795,6 @@ jQuery(function($){
                 // Set the appropriate properties for the current player.
                 App.myRole = 'Player';
                 App.Player.myName = data.playerName;
-            },
-
-            /**
-             *  Click handler for the Player hitting a word in the word list.
-             */
-            onPlayerAnswerClick: function() {
-                // console.log('Clicked Answer Button');
-                var $btn = $(this);      // the tapped button
-                var answer = $btn.val(); // The tapped word
-
-                // Send the player info and tapped word to the server so
-                // the host can check the answer.
-                var data = {
-                    gameId: App.gameId,
-                    playerId: App.mySocketId,
-                    answer: answer,
-                    round: App.currentRound
-                }
-                IO.socket.emit('playerAnswer',data);
             },
 
             /**

@@ -36,7 +36,6 @@ exports.initGame = function(sio, socket, sdb){
 
     // Player Events
     gameSocket.on('playerJoinGame', playerJoinGame);
-    gameSocket.on('playerAnswer', playerAnswer);
     gameSocket.on('playerRestart', playerRestart);
     gameSocket.on('playerRobbed', playerRobbed);
     gameSocket.on('playersTroubled', playersTroubled);
