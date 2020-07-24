@@ -538,6 +538,7 @@ jQuery(function($){
             // Host
             App.$doc.on('click', '#btnCreateGame', App.Host.onCreateClick);
             App.$doc.on('click', '#btnGameConfig', App.Host.onConfigClick);
+            App.$doc.on('input change', '#playerCountRange', App.Host.updatePlayerCount);
 
             // Player
             App.$doc.on('click', '#btnJoinGame', App.Player.onJoinClick);
@@ -616,12 +617,39 @@ jQuery(function($){
              * Handler for the config button after the Title Screen
              */
             onConfigClick: function () {
+                var radios = document.getElementsByName('roleSets');
+                var chosenRoleSet = 0;
+
+                for (var i = 0, length = radios.length; i < length; i++) {
+                    if (radios[i].checked) {
+                        // do whatever you want with the checked radio
+                        chosenRoleSet = radios[i].value;
+
+                        // only one radio can be logically checked, don't check the rest
+                        break;
+                    }
+                }
+
                 // collect data to send to the server
                 var data = {
-                    playerCount : ($('#playerCountRange').val())
+                    playerCount : ($('#playerCountRange').val()),
+                    chosenRoleSet : chosenRoleSet
                 };
 
+                console.log(data);
+
                 IO.socket.emit('hostCreateNewGame', data);
+            },
+
+            /**
+             * Handler for the input range slider for player count on room creation screen
+             */
+            updatePlayerCount: function() {
+                document.getElementById("plannedPlayerCount").innerHTML = this.value + " players";
+
+                document.getElementById('roleSet0_label').innerHTML = App.Player.roleMatrix[this.value][0].join(', ');
+                document.getElementById('roleSet1_label').innerHTML =App.Player.roleMatrix[this.value][1].join(', ');
+                document.getElementById('roleSet2_label').innerHTML = App.Player.roleMatrix[this.value][2].join(', ');
             },
 
             /**
@@ -765,6 +793,27 @@ jQuery(function($){
              * The player's current game role
              */
             gameRole: '',
+
+            roleMatrix: {
+                '3': [["werewolf","werewolf","seer","robber","troublemaker","villager"],
+                    ["werewolf","minion","seer","robber","troublemaker","villager"],
+                    ["werewolf","werewolf","seer","robber","troublemaker","insomniac"]],
+                '4': [["werewolf","werewolf","seer","robber","troublemaker","villager","villager"],
+                    ["werewolf","werewolf","seer","robber","troublemaker","insomniac","villager"],
+                    ["werewolf","werewolf","seer","robber","troublemaker","insomniac","drunk"]],
+                '5': [["werewolf","werewolf","seer","robber","troublemaker","villager","villager","villager"],
+                    ["werewolf","werewolf","seer","robber","troublemaker","insomniac","villager","villager"],
+                    ["werewolf","werewolf","seer","robber","troublemaker","insomniac","drunk","villager"]],
+                '6': [["werewolf","werewolf","minion","seer","robber","troublemaker","tanner","villager","villager"],
+                    ["werewolf","werewolf","minion","seer","robber","troublemaker","tanner","drunk","villager"],
+                    ["werewolf","werewolf","minion","seer","robber","troublemaker","insomniac","drunk","villager"]],
+                '7': [["werewolf","werewolf","minion","seer","robber","troublemaker","drunk","villager","villager","villager"],
+                    ["werewolf","werewolf","minion","seer","robber","troublemaker","tanner","drunk","villager","villager"],
+                    ["werewolf","werewolf","minion","seer","robber","troublemaker","tanner","drunk","insomnia","villager"]],
+                '8': [["werewolf","werewolf","minion","seer","robber","troublemaker","drunk","villager","villager","villager","villager"],
+                    ["werewolf","werewolf","minion","seer","robber","troublemaker","tanner","drunk","villager","villager","villager"],
+                    ["werewolf","werewolf","minion","seer","robber","troublemaker","tanner","drunk","insomnia","villager","villager"]],
+            },
 
             /**
              * Click handler for the 'JOIN' button

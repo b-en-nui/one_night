@@ -3,12 +3,24 @@ var gameSocket;
 var db;
 
 var roleMatrix = {
-    '3': ["werewolf","minion","seer","robber","troublemaker","villager"],
-    '4': ["werewolf","seer","robber","troublemaker","drunk","insomniac","tanner"],
-    '5': ["werewolf","seer","robber","troublemaker","drunk","insomniac","tanner","villager"],
-    '6': ["werewolf","minion","seer","robber","troublemaker","drunk","insomniac","tanner","villager"],
-    '7': ["werewolf","werewolf","minion","seer","robber","troublemaker","drunk","insomniac","tanner","villager"],
-    '8': ["werewolf","werewolf","minion","seer","robber","troublemaker","drunk","insomniac","tanner","villager","villager"]
+    '3': [["werewolf","werewolf","seer","robber","troublemaker","villager"],
+        ["werewolf","minion","seer","robber","troublemaker","villager"],
+        ["werewolf","werewolf","seer","robber","troublemaker","insomniac"]],
+    '4': [["werewolf","werewolf","seer","robber","troublemaker","villager","villager"],
+        ["werewolf","werewolf","seer","robber","troublemaker","insomniac","villager"],
+        ["werewolf","werewolf","seer","robber","troublemaker","insomniac","drunk"]],
+    '5': [["werewolf","werewolf","seer","robber","troublemaker","villager","villager","villager"],
+        ["werewolf","werewolf","seer","robber","troublemaker","insomniac","villager","villager"],
+        ["werewolf","werewolf","seer","robber","troublemaker","insomniac","drunk","villager"]],
+    '6': [["werewolf","werewolf","minion","seer","robber","troublemaker","tanner","villager","villager"],
+        ["werewolf","werewolf","minion","seer","robber","troublemaker","tanner","drunk","villager"],
+        ["werewolf","werewolf","minion","seer","robber","troublemaker","insomniac","drunk","villager"]],
+    '7': [["werewolf","werewolf","minion","seer","robber","troublemaker","drunk","villager","villager","villager"],
+        ["werewolf","werewolf","minion","seer","robber","troublemaker","tanner","drunk","villager","villager"],
+        ["werewolf","werewolf","minion","seer","robber","troublemaker","tanner","drunk","insomnia","villager"]],
+    '8': [["werewolf","werewolf","minion","seer","robber","troublemaker","drunk","villager","villager","villager","villager"],
+        ["werewolf","werewolf","minion","seer","robber","troublemaker","tanner","drunk","villager","villager","villager"],
+        ["werewolf","werewolf","minion","seer","robber","troublemaker","tanner","drunk","insomnia","villager","villager"]],
 }
 
 var voteStore = {};
@@ -60,7 +72,7 @@ function hostCreateNewGame(data) {
     var thisGameId = ( Math.random() * 100000 ) | 0;
 
     // Return the Room ID (gameId) and the socket ID (mySocketId) to the browser client
-    this.emit('newGameCreated', {gameId: thisGameId, mySocketId: this.id, maxPlayers: data.playerCount, roleList: shuffle(roleMatrix[data.playerCount])});
+    this.emit('newGameCreated', {gameId: thisGameId, mySocketId: this.id, maxPlayers: data.playerCount, roleList: shuffle(roleMatrix[data.playerCount][data.chosenRoleSet])});
 
     // Join the Room and wait for the players
     this.join(thisGameId.toString());

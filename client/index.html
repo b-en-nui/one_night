@@ -50,13 +50,21 @@
     <script id="game-config-template" type="text/template">
         <div class="gameConfigWrapper">
             <div class="info">
-                <label for="playerCountRange">How many players?</label>
+                <h1>How many players?</h1>
                 <input type="range" class="custom-range" min="3" max="8" step="1" id="playerCountRange">
+                <div id="plannedPlayerCount">Choose between 3 and 8</div>
             </div>
-
+            <br><br>
             <div class="info">
-                <label for="inputPlayerName">What roles should be included?</label>
-                <input id="inputPlayerName" type="text" />
+                <h1>What roles should be included?</h1>
+                <form>
+                    <input type="radio" id="roleSet0" name="roleSets" value="0">
+                    <label id="roleSet0_label" for="roleSet0">role set 0</label><br>
+                    <input type="radio" id="roleSet1" name="roleSets" value="1">
+                    <label id="roleSet1_label"  for="roleSet1">role set 1</label><br>
+                    <input type="radio" id="roleSet2" name="roleSets" value="2">
+                    <label id="roleSet2_label"  for="roleSet2">role set 2</label>
+                </form> 
             </div>
 
             <div class="info buttons">
