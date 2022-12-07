@@ -4,7 +4,7 @@
   "description": "Multiplayer online social deduction game",
   "main": "index.js",
   "dependencies": {
-    "express": "^4.17.1",
+    "express": "^4.18.2",
     "jquery": "^3.5.0",
     "socket.io": "^2.3.0",
     "sqlite3": "^4.2.0"
